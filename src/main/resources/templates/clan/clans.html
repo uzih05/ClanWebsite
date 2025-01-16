@@ -51,7 +51,7 @@
                         <div style="position: absolute; left: 80px; bottom: 12px; display: flex; align-items: center; gap: 12px;">
                             <div style="display: flex; align-items: center; gap: 4px;">
                                 <div style="width: 12px; height: 12px; background: #6B7280; mask: url(person.svg) center/contain no-repeat;"></div>
-                                <span style="color: #6B7280; font-size: 11.62px;" th:value="${clan.getMembers().size()}">35명</span>
+                                <span style="color: #6B7280; font-size: 11.62px;" th:text="${clan.getMembers().size()} + '명'">35명</span>
                             </div>
                         </div>
                     </div>
