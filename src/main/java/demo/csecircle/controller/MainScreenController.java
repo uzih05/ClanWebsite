@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @RequiredArgsConstructor
 public class MainScreenController {
 
-    @GetMapping("/test")
+    @GetMapping("/")
     public String sessionValidate(@SessionAttribute (name = UserConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
         if (loginMember == null) {
             return "member/login";
         }
         model.addAttribute("member", loginMember);
-        return "/";
+        return "index";
     }
 
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>My Page</title>
+</head>
+<body>
+<div style="width: 402px; height: 874px; background: white; flex-direction: column; justify-content: center; align-items: flex-start; display: inline-flex">
+
+    <!-- 메인 프레임 -->
+    <div style="align-self: stretch; flex: 1 1 0; background: #F9FAFB; flex-direction: column; justify-content: flex-end; align-items: center; display: inline-flex">
+        <div style="width: 402px; height: 810px; position: relative; flex-direction: column; justify-content: flex-start; align-items: flex-start; display: flex">
+
+            <!-- 프로필 카드 영역 -->
+            <div style="width: 378px; height: 156px; position: relative; background: white; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05); border-radius: 8px">
+                <!-- 프로필 이미지 -->
+                <div data-layer="Background" class="Background"
+                     style="width: 64px; height: 64px; padding: 12px; left: 16px; top: 16px;
+                    position: absolute; background: #E5E7EB; border-radius: 9999px;
+                    justify-content: center; align-items: center; display: inline-flex">
+                    <div data-layer="SVG" class="Svg"
+                         style="flex: 1 1 0; align-self: stretch; padding-left: 8.33px;
+                      padding-right: 8.33px; padding-top: 5px; padding-bottom: 5px;
+                      justify-content: center; align-items: center; display: inline-flex">
+                        <div data-layer="Vector" class="Vector"
+                             style="width: 23.33px; height: 30px; border: 3.33px #9CA3AF solid">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 이름 -->
+                <div style="width: 54.20px; height: 28px; left: 92px; top: 24px; position: absolute; color: black; font-size: 18px; font-family: Inter; font-weight: 700; line-height: 28px; word-wrap: break-word"
+                     th:text="${member.name}">
+                </div>
+
+                <!-- 학과/학년 -->
+                <div style="width: 131.67px; height: 20px; left: 92px; top: 52px; position: absolute; color: #4B5563; font-size: 14px; font-family: Inter; font-weight: 400; line-height: 20px; word-wrap: break-word"
+                     th:text="${member.getMajor() + ' ' + member.getGrade()}">
+                </div>
+
+                <!-- 가입한 동아리 수 -->
+                <div style="width: 11.33px; height: 28px; left: 64.09px; top: 96px; position: absolute; text-align: center; color: black; font-size: 20px; font-family: Inter; font-weight: 700; line-height: 28px; word-wrap: break-word"
+                     th:text="${clanList.size()}">
+                </div>
+                <div style="width: 75.54px; height: 16px; left: 31.98px; top: 124px; position: absolute; text-align: center; color: #6B7280; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 16px; word-wrap: break-word">
+                    가입한 동아리
+                </div>
+
+                <!-- 로그아웃 버튼 -->
+                <form th:action="@{/logout}" method="post">
+                    <button class="btn btn-secondary btn-block" type="submit">
+                        로그아웃
+                    </button>
+                </form>
+            </div>
+
+            <!-- 가입한 동아리 목록 -->
+            <div style="width: 378px; position: relative; background: white; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05); border-radius: 8px; padding: 16px">
+
+                <div style="width: 100%; height: 20px; position: relative; color: black; font-size: 14px; font-family: Inter; font-weight: 700; line-height: 20px; word-wrap: break-word">
+                    가입한 동아리
+                </div>
+
+                <!-- 동아리 목록 출력 -->
+                <div th:if="${#lists.isEmpty(clanList)}" style="margin-top: 20px; color: #6B7280; font-size: 14px; text-align: center;">
+                    가입된 동아리가 없습니다.
+                </div>
+                <div th:unless="${#lists.isEmpty(clanList)}">
+                    <div th:each="clan : ${clanList}" style="margin-top: 10px;">
+                        <div style="color: black; font-size: 14px; font-family: Inter; font-weight: 700; word-wrap: break-word"
+                             th:text="${clan.getClanName()}">
+                        </div>
+                        <div style="color: #6B7280; font-size: 12px; font-family: Inter; word-wrap: break-word"
+                             th:text="${clan.leaderName == member.name ? '부장' : '부원'}">
+                        </div>
+                        <div style="text-align: center; color: #3B82F6; font-size: 12px; font-family: Inter; cursor: pointer;">
+                            <a th:href="@{/clan/detail/{id}(id=${clan.id})}">활동내역</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

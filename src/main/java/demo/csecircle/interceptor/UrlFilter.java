@@ -14,7 +14,7 @@ public class UrlFilter implements HandlerInterceptor {
         String requestURI = request.getRequestURI();
         HttpSession session = request.getSession(false);
         if(session==null|| session.getAttribute(UserConst.LOGIN_MEMBER)==null){
-            response.sendRedirect("/login?redirectURL="+requestURI);
+            response.sendRedirect("/member/login?redirectURL="+requestURI);
             return false;
         }
         return true;

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Club Explorer</title>
+</head>
+<body>
+<div style="width: 402px; height: 874px; background: white; flex-direction: column; justify-content: center; align-items: flex-start; display: inline-flex" class="Iphone16ProBody">
+    <div style="align-self: stretch; flex: 1 1 0; background: #F9FAFB; flex-direction: column; justify-content: flex-end; align-items: center; display: inline-flex" class="Frame">
+        <div style="width: 402px; height: 810px; position: relative; flex-direction: column; justify-content: flex-start; align-items: flex-start; display: flex" class="Container">
+
+            <!-- 검색창 부분 -->
+            <form th:action="@{/clans}" method="get" class="w-full">
+                <div style="width: 378px; height: 62px; position: relative; background: white; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05); border-radius: 8px" class="BackgroundShadow">
+                    <div style="height: 38px; padding-top: 9px; padding-bottom: 10px; padding-left: 37px; padding-right: 13px; left: 12px; top: 12px; position: absolute; background: white; border-radius: 8px; overflow: hidden; border: 1px #D1D5DB solid; justify-content: flex-end; align-items: center; display: inline-flex" class="Input">
+                        <input type="text"
+                               name="clanName"
+                               th:value="${param.clanName}"
+                               style="width: 304px; border: none; outline: none; color: #9CA3AF; font-size: 14px; font-family: Inter;"
+                               placeholder="동아리 검색...">
+                    </div>
+                    <button type="submit" style="width: 16px; height: 16px; padding: 2px; left: 22px; top: 22px; position: absolute; justify-content: center; align-items: center; display: inline-flex">
+                        <div style="width: 12px; height: 12px; border: 1.33px #9CA3AF solid"></div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- 전체 동아리 섹션 -->
+            <div style="width: 378px; position: relative; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="color: black; font-size: 18px; font-family: Inter; font-weight: 700; line-height: 28px;">전체 동아리</div>
+
+                    <!-- 정렬 옵션 -->
+                    <div style="height: 26px; padding: 5px 25px 5px 13px; background: #EFEFEF; border-radius: 8px; border: 1px #E5E7EB solid; display: inline-flex; align-items: center;">
+                        <div style="color: black; font-size: 14px; font-family: Inter; font-weight: 400; line-height: 14px;">최신순</div>
+                    </div>
+                </div>
+
+                <!-- 동아리 카드 리스트 -->
+                <div class="club-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- 동아리 카드 반복 -->
+                    <div th:each="clan : ${clanList}" style="width: 378px; height: 80px; background: white; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05); border-radius: 8px; position: relative;">
+                        <div style="width: 56px; height: 56px; left: 12px; top: 12px; position: absolute; border-radius: 8px; background: #E5E7EB"></div>
+                        <div style="width: 88.11px; height: 20px; left: 80px; top: 12px; position: absolute; color: black; font-size: 14px; font-family: Inter; font-weight: 700; line-height: 20px;" th:text="${clan.clanName}">동아리명</div>
+                        <div style="width: 16px; height: 16px; padding: 1.60px; left: 171.91px; top: 14px; position: absolute; display: flex; justify-content: center; align-items: center;">
+                            <div style="width: 12.80px; height: 12.80px; background: #3B82F6"></div>
+                        </div>
+                        <div style="width: 102.22px; height: 16px; left: 80px; top: 32px; position: absolute; color: #4B5563; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 16px;">카테고리</div>
+
+                        <!-- 하단 정보 (인원수, 모임주기) -->
+                        <div style="position: absolute; left: 80px; bottom: 12px; display: flex; align-items: center; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <div style="width: 12px; height: 12px; background: #6B7280; mask: url(person.svg) center/contain no-repeat;"></div>
+                                <span style="color: #6B7280; font-size: 11.62px;" th:value="${clan.getMembers().size()}">35명</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 내비게이션 -->
+            <div style="width: 402px; height: 69px; padding-top: 1px; background: white; border-top: 1px #E5E7EB solid; justify-content: center; align-items: center; display: inline-flex; position: fixed; bottom: 0;" class="Nav">
+                <div style="flex: 1 1 0; align-self: stretch; padding: 12px 91.50px; justify-content: center; align-items: flex-start; gap: 159px; display: inline-flex" class="Container">
+                    <div style="width: 24px; align-self: stretch; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; display: inline-flex">
+                        <div style="width: 24px; height: 24px; padding: 3px; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="width: 18px; height: 18px; border: 2px #3B82F6 solid"></div>
+                        </div>
+                        <div style="color: #3B82F6; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 16px;">탐색</div>
+                    </div>
+                    <div style="width: 36px; align-self: stretch; flex-direction: column; justify-content: center; align-items: center; gap: 4px; display: inline-flex">
+                        <div style="width: 24px; height: 24px; padding: 3px; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="width: 14px; height: 18px; border: 2px #6B7280 solid"></div>
+                        </div>
+                        <div style="color: #6B7280; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 16px;">내정보</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

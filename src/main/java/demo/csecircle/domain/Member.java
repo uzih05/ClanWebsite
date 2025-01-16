@@ -20,10 +20,12 @@ public class Member {
 
     private String nickname;
 
+    @Column(unique = true)
     private String loginId;
 
     private String password;
 
+    @Column(unique = true)
     private String email; // 학교메일만 허용
 
     private int sex; //성별 남자=0 여자=1
