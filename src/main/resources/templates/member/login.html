@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-white">
+<div class="w-full max-w-md mx-auto min-h-screen flex flex-col justify-center px-4">
+    <div class="w-full">
+        <!-- 헤더 -->
+        <h2 class="text-xl font-semibold text-center mb-8">로그인</h2>
+
+        <!-- 에러 메시지 -->
+        <div th:if="${param.error}" class="mb-4">
+            <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
+                이메일 또는 비밀번호가 일치하지 않습니다.
+            </div>
+        </div>
+
+        <!-- 로그아웃 메시지 -->
+        <div th:if="${param.logout}" class="mb-4">
+            <div class="bg-green-50 text-green-600 px-4 py-3 rounded-lg">
+                로그아웃되었습니다.
+            </div>
+        </div>
+
+        <!-- 로그인 폼 -->
+        <form th:action="@{/member/login}" method="post" class="space-y-4">
+            <!-- 리다이렉트 URL -->
+            <input type="hidden" name="redirectURL" th:value="${param.redirectURL}">
+
+            <!-- 이메일 입력 -->
+            <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="far fa-envelope"></i>
+                    </span>
+                <input type="text"
+                       name="loginId"
+                       class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                       placeholder="이메일">
+            </div>
+
+            <!-- 비밀번호 입력 -->
+            <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                <input type="password"
+                       name="password"
+                       class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                       placeholder="비밀번호">
+            </div>
+
+            <!-- 로그인 상태 유지 -->
+            <div class="flex items-center">
+                <input type="checkbox" id="remember" class="w-4 h-4 border-gray-300 rounded">
+                <label for="remember" class="ml-2 text-sm text-gray-600">로그인 상태 유지</label>
+            </div>
+
+            <!-- 로그인 버튼 -->
+            <button type="submit"
+                    class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition-colors">
+                로그인
+            </button>
+        </form>
+
+        <!-- 회원가입 및 비밀번호 찾기 링크 -->
+        <div class="mt-6 text-center space-y-4">
+            <p class="text-gray-600">
+                계정이 없으신가요?
+                <a href="/member/register" class="text-black font-medium">회원가입</a>
+            </p>
+            <a href="/member/forgot-password" class="block text-black">비밀번호를 잊으셨나요?</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

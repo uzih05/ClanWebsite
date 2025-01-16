@@ -12,7 +12,7 @@ public class UrlConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UrlFilter())
-                .addPathPatterns("/**");
+                .addPathPatterns("/test");
     }
 
 }

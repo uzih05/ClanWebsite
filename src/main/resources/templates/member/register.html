@@ -1,55 +1,142 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원 가입</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <title>회원가입</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-<div class="container mt-5">
-    <h2>회원 가입</h2>
+<body class="bg-white">
+    <div class="w-full max-w-md mx-auto min-h-screen flex flex-col justify-center px-4">
+        <div class="w-full">
+            <!-- 헤더 -->
+            <h2 class="text-xl font-semibold text-center mb-8">회원가입</h2>
 
-    <!-- 로그인된 사용자 정보 표시 -->
-    <div class="mb-3">
-        <label for="existingName" class="form-label">로그인된 사용자 이름</label>
-        <input type="text" class="form-control" id="existingName" th:value="${member.name}" readonly>
+            <!-- 에러 메시지 -->
+            <div th:if="${param.error}" class="mb-4">
+                <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
+                    비밀번호가 일치하지 않습니다.
+                </div>
+            </div>
+
+            <!-- 회원가입 폼 -->
+            <form th:action="@{/member/register}" method="post" class="space-y-4">
+                <!-- 이메일 입력 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="far fa-envelope"></i>
+                    </span>
+                    <input type="email" 
+                           name="email"
+                           required
+                           class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                           placeholder="이메일">
+                </div>
+
+                <!-- 아이디 입력 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="far fa-user"></i>
+                    </span>
+                    <input type="text" 
+                           name="loginId"
+                           required
+                           class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                           placeholder="아이디">
+                </div>
+
+                <!-- 이름 입력 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="far fa-user"></i>
+                    </span>
+                    <input type="text" 
+                           name="name"
+                           required
+                           class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                           placeholder="이름">
+                </div>
+
+                <!-- 비밀번호 입력 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" 
+                           name="password"
+                           required
+                           class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                           placeholder="비밀번호">
+                </div>
+
+                <!-- 비밀번호 확인 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" 
+                           name="passwordConfirm"
+                           required
+                           class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                           placeholder="비밀번호 확인">
+                </div>
+
+                <!-- 학년 선택 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="fas fa-graduation-cap"></i>
+                    </span>
+                    <select name="grade" 
+                            required
+                            class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black appearance-none">
+                        <option value="">학년 선택</option>
+                        <option value="1">1학년</option>
+                        <option value="2">2학년</option>
+                        <option value="3">3학년</option>
+                        <option value="4">4학년</option>
+                    </select>
+                </div>
+
+                <!-- 성별 선택 -->
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <i class="fas fa-venus-mars"></i>
+                    </span>
+                    <select name="sex" 
+                            required
+                            class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black appearance-none">
+                        <option value="">성별 선택</option>
+                        <option value="1">남성</option>
+                        <option value="2">여성</option>
+                    </select>
+                </div>
+
+                <!-- 이용약관 동의 -->
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" 
+                           required
+                           id="terms" 
+                           class="w-4 h-4 border-gray-300 rounded focus:ring-black">
+                    <label for="terms" class="text-sm text-gray-600">
+                        <span class="font-medium">이용 약관</span>과 
+                        <span class="font-medium">개인정보 처리 방침</span>에 동의합니다.
+                    </label>
+                </div>
+
+                <!-- 회원가입 버튼 -->
+                <button type="submit" 
+                        class="w-full bg-black text-white py-4 rounded-md hover:bg-gray-800 transition-colors">
+                    회원가입
+                </button>
+
+                <!-- 로그인 링크 -->
+                <div class="text-center text-sm text-gray-600">
+                    이미 계정이 있으신가요? 
+                    <a href="/member/login" class="text-black font-medium">로그인</a>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <!-- 새로운 사용자 등록 폼 -->
-    <form action="/member/register" method="post">
-        <div class="mb-3">
-            <label for="name" class="form-label">이름</label>
-            <input type="text" class="form-control" id="name" name="name" th:value="${newMember.name}" required>
-        </div>
-        <div class="mb-3">
-            <label for="loginId" class="form-label">로그인 ID</label>
-            <input type="text" class="form-control" id="loginId" name="loginId" th:value="${newMember.loginId}" required>
-        </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">이메일</label>
-            <input type="email" class="form-control" id="email" name="email" th:value="${newMember.email}" required>
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">비밀번호</label>
-            <input type="password" class="form-control" id="password" name="password" th:value="${newMember.password}" required>
-        </div>
-        <div class="mb-3">
-            <label for="grade" class="form-label">등급</label>
-            <input type="number" class="form-control" id="grade" name="grade" th:value="${newMember.grade}" required>
-        </div>
-        <div class="mb-3">
-            <label for="sex" class="form-label">성별</label>
-            <select class="form-select" id="sex" name="sex" th:value="${newMember.sex}" required>
-                <option value="1">남성</option>
-                <option value="2">여성</option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">회원 가입</button>
-    </form>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
