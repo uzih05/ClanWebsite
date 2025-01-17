@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -30,7 +32,7 @@ public class Member {
 
     private int sex; //성별 남자=0 여자=1
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Major major; //학과
 
     private int grade; //학년
@@ -39,9 +41,7 @@ public class Member {
     @JoinColumn(name = "clan_id")
     private Clan clan;
 
-
-
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "signup_clan_id")
+    private Clan signupClan;
 }

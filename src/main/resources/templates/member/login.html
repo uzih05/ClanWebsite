@@ -16,7 +16,7 @@
         <!-- 에러 메시지 -->
         <div th:if="${param.error}" class="mb-4">
             <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
-                이메일 또는 비밀번호가 일치하지 않습니다.
+                아이디 또는 비밀번호가 일치하지 않습니다.
             </div>
         </div>
 
@@ -32,15 +32,15 @@
             <!-- 리다이렉트 URL -->
             <input type="hidden" name="redirectURL" th:value="${param.redirectURL}">
 
-            <!-- 이메일 입력 -->
+            <!-- 사용자명 입력 -->
             <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="far fa-envelope"></i>
+                        <i class="far fa-user"></i>
                     </span>
                 <input type="text"
                        name="loginId"
                        class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                       placeholder="이메일">
+                       placeholder="아이디">
             </div>
 
             <!-- 비밀번호 입력 -->

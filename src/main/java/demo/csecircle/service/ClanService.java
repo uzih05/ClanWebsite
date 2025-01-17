@@ -16,6 +16,7 @@ import java.util.List;
 public class ClanService {
 
     private final ClanRepository clanRepository;
+    private final MemberRepository memberRepository;
 
     public List<Clan> getMemberClanList(Member member){
         return clanRepository.findClanByMembersId(member.getId());
@@ -31,6 +32,17 @@ public class ClanService {
 
     public void saveClan(Clan clan){
         clanRepository.save(clan);
+    }
+
+    public Clan findClanById(Long id){
+        return clanRepository.findById(id).orElse(null);
+    }
+
+    public void signupClan(Clan clan, Member member){
+        clan.getSignupMembers().add(member);
+        clanRepository.save(clan);
+        member.setSignupClan(clan);
+        memberRepository.save(member);
     }
 
 

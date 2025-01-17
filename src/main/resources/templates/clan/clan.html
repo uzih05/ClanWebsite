@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Detail (폰 화면용)</title>
+
+    <!-- Font Awesome (SRI 미검증 버전) -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+          referrerpolicy="no-referrer" />
+
+    <!-- ================================
+         1) 스타일(디자인) 정의
+    ================================== -->
+    <style>
+        /* 전체를 감싸는 컨테이너: 폰에서도 화면 중앙 정렬 */
+        .outer-wrapper {
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 33px;
+            padding-bottom: 75px;
+            background: #F9FAFB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        /* 카드(내용) 컨테이너 */
+        .card-container {
+            width: 338px;           /* 최대 폭 고정 */
+            background: #FFFFFF;
+            box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.10);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* 내부 배치는 flex-start로 */
+            position: relative;      /* 필수 정보 섹션 등에 absolute가 있기 때문 */
+        }
+
+        /* (1) 동아리 이름 영역 */
+        .club-name-area {
+            width: 100%;
+            padding-top: 16px;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .club-name-text {
+            color: #111827;
+            font-size: 24px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 32px;
+            word-wrap: break-word;
+        }
+
+        /* (2) 로고 영역 */
+        .logo-container {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            margin: 0 auto; /* 가운데 정렬 */
+            position: relative;
+        }
+        .logo-image {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+            position: absolute;
+        }
+
+        /* (3) 리더/설립년도 */
+        .leader-info {
+            margin: 8px auto 0;
+            color: #6B7280;
+            font-size: 14px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 20px;
+            word-wrap: break-word;
+        }
+
+        /* (4) 모집 상태 */
+        .recruit-bar {
+            width: 100%;
+            padding: 8px 10px;
+            border-top: 1px #E5E7EB solid;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .recruit-status {
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .icon-yes {
+            color: #16A34A;
+            font-size: 16px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            line-height: 16px;
+            word-wrap: break-word;
+        }
+        .text-yes {
+            color: #166534;
+            font-size: 16px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 24px;
+            word-wrap: break-word;
+        }
+        .icon-no {
+            color: #DC2626;
+            font-size: 16px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            line-height: 16px;
+            word-wrap: break-word;
+        }
+        .text-no {
+            color: #B91C1C;
+            font-size: 16px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 24px;
+            word-wrap: break-word;
+        }
+
+        /* (4-1) 모집중 바 */
+        .recruit-yes {
+            background: #F0FDF4;
+            justify-content: space-between; /* 문구와 버튼 사이 공간 확보 */
+        }
+        /* (4-2) 모집종료 바 */
+        .recruit-no {
+            background: #FEF2F2;
+            justify-content: flex-start;
+        }
+
+        /* (5) 가입하기 버튼 */.join-btn {
+                             height: 50px; /* 버튼 높이를 더 크게 */
+                             padding: 10px 20px; /* 버튼 내부 여백을 더 넓게 */
+                             background: #4CAF50; /* 배경 색상을 초록색으로 */
+                             border-radius: 6px; /* 모서리를 둥글게 */
+                             display: flex;
+                             justify-content: center;
+                             align-items: center;
+                             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* 그림자 추가 */
+                             transition: background-color 0.3s, transform 0.2s; /* 호버 시 색상 변경 및 크기 변화 */
+                         }
+
+            .join-btn-text {
+                color: white;
+                font-size: 18px; /* 글씨 크기 증가 */
+                font-family: Segoe UI Symbol, sans-serif;
+                font-weight: 600; /* 글씨 두껍게 */
+                text-align: center;
+                word-wrap: break-word;
+            }
+
+        /* (6) 소개 */
+        .introduce-title {
+            width: 100%;
+            margin-top: 16px;
+            margin-left: 16px;
+            color: #111827;
+            font-size: 18px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 28px;
+            word-wrap: break-word;
+        }
+        .introduce-text {
+            width: 100%;
+            max-width: 288.36px;
+            margin: 8px 16px;
+            color: #4B5563;
+            font-size: 15.88px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 24px;
+            word-wrap: break-word;
+        }
+
+        /* (7) 필수 정보 섹션 */
+        .essential-info {
+            width: 290px;
+            height: 264px;
+            position: relative;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin: 16px auto;
+        }
+        .essential-info-title {
+            width: 183.01px;
+            height: 28px;
+            left: 24px;
+            top: 24px;
+            position: absolute;
+            color: #111827;
+            font-size: 18px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 28px;
+            word-wrap: break-word;
+        }
+        .icon-meeting {
+            width: 16.39px;
+            height: 16px;
+            left: 24px;
+            top: 72px;
+            position: absolute;
+            color: black;
+            font-size: 16px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            line-height: 16px;
+            word-wrap: break-word;
+        }
+        .icon-location {
+            width: 12.34px;
+            height: 16px;
+            left: 24px;
+            top: 148px;
+            position: absolute;
+            color: black;
+            font-size: 16px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            line-height: 16px;
+            word-wrap: break-word;
+        }
+        .icon-contact {
+            width: 16.39px;
+            height: 16px;
+            left: 24px;
+            top: 204px;
+            position: absolute;
+            color: black;
+            font-size: 16px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            line-height: 16px;
+            word-wrap: break-word;
+        }
+        .info-meeting {
+            width: 210.81px;
+            height: 54px;
+            left: 54.03px;
+            top: 71px;
+            position: absolute;
+        }
+        .info-location {
+            width: 209px;
+            height: 34px;
+            left: 56px;
+            top: 147px;
+            position: absolute;
+        }
+        .info-contact {
+            width: 209px;
+            height: 34px;
+            left: 56px;
+            top: 203px;
+            position: absolute;
+        }
+        .info-title {
+            color: #111827;
+            font-size: 14px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 20px;
+            word-wrap: break-word;
+        }
+        .info-detail {
+            color: #4B5563;
+            font-size: 14px;
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 400;
+            line-height: 20px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body style="margin:0; padding:0; font-family: Segoe UI Symbol, sans-serif;">
+
+<!-- ================================
+     2) 기능(타임리프 + 구조) 정의
+================================== -->
+
+<!-- 화면 전체 감싸는 컨테이너 -->
+<div class="outer-wrapper" th:fragment="clan-page">
+
+    <!-- 카드 컨테이너 -->
+    <div class="card-container">
+
+        <!-- (1) 동아리 이름 영역 -->
+        <div class="club-name-area">
+            <div class="club-name-text" th:text="${clan.clanName}">
+                동아리 이름
+            </div>
+        </div>
+
+        <!-- (2) 로고 영역 -->
+        <div class="logo-container">
+            <img class="logo-image" th:src="@{/images/default-logo.gif}" alt="Clan Logo">
+        </div>
+
+        <!-- (3) 리더/설립년도 -->
+        <div class="leader-info" th:text="'Leader: ' + ${clan.leaderName}">
+            Est. 2015
+        </div>
+
+        <!-- (4) 모집 상태: YES -->
+        <!-- (4) 모집 상태: YES -->
+        <!-- (4) 모집 상태: YES -->
+        <!-- 가입 버튼 -->
+        <div class="recruit-bar recruit-yes" th:if="${clan != null
+                                              and clan.getSignupMembers() != null
+                                              and clan.isRecruit.toString().equals('YES')
+                                              and not #lists.contains(clan.getSignupMembers(), member)
+                                              and member != null
+                                              and member.getSignupClan().id != clan.id}">
+            <div class="recruit-status">
+                <div class="icon-yes"></div>
+                <div class="text-yes">현재 모집중.</div>
+            </div>
+            <!-- 가입하기 버튼 -->
+            <form th:action="@{/clans/signup/{clanId}(clanId=${clan.id})}" method="post">
+                <button class="join-btn" type="submit">
+                    가입하기
+                </button>
+            </form>
+        </div>
+
+        <!-- 이미 신청됨 상태 -->
+        <div class="recruit-bar recruit-yes" th:if="${member != null
+                                              and member.getSignupClan() != null
+                                              and clan != null
+                                              and clan.isRecruit.toString().equals('YES')
+                                              and member.getSignupClan().id == clan.id}">
+            <div class="recruit-status">
+                <div class="icon-yes"></div>
+                <div class="text-yes">이미 신청됨.</div>
+            </div>
+        </div>
+
+        <!-- (4-1) 모집 상태: NO -->
+        <div class="recruit-bar recruit-no" th:if="${clan.isRecruit.toString().equals('NO')}">
+            <div class="recruit-status">
+                <div class="icon-no"></div>
+                <div class="text-no">모집이 종료되었습니다.</div>
+            </div>
+        </div>
+
+        <!-- (5) 소개 영역 -->
+        <div class="introduce-title">소개</div>
+        <div class="introduce-text" th:text="${clan.description}">
+            이 동아리의 소개 내용 (동적으로 늘어날 예정)
+        </div>
+
+        <!-- (6) 필수 정보 섹션 -->
+        <div class="essential-info">
+            <div class="essential-info-title">필수 정보</div>
+
+            <!-- 모임 일정 -->
+            <div class="icon-meeting"></div>
+            <div class="info-meeting">
+                <span class="info-title">모임 일정<br/></span>
+                <span class="info-detail" th:text="${clan.meetingTime}">
+            매주 무슨 요일 (시간 포맷)
+          </span>
+            </div>
+
+            <!-- 장소 -->
+            <div class="icon-location"></div>
+            <div class="info-location">
+                <span class="info-title">장소<br/></span>
+                <span class="info-detail" th:text="${clan.clanLocation}">
+            학생회관 몇층 몇호
+          </span>
+            </div>
+
+            <!-- 연락처 -->
+            <div class="icon-contact"></div>
+            <div class="info-contact">
+                <span class="info-title">연락처<br/></span>
+                <span class="info-detail" th:text="${clan.telNum}">
+            전화번호든 이메일이든 카톡
+          </span>
+            </div>
+        </div>
+
+    </div><!-- /card-container -->
+</div><!-- /outer-wrapper -->
+
+</body>
+</html>

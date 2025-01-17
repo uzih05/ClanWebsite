@@ -1,16 +1,15 @@
 package demo.csecircle.controller;
 
+import demo.csecircle.UserConst;
 import demo.csecircle.controller.form.ClanForm;
 import demo.csecircle.controller.form.ClanSearchForm;
 import demo.csecircle.domain.Clan;
+import demo.csecircle.domain.Member;
 import demo.csecircle.service.ClanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +28,14 @@ public class ClanController {
         return "clan/clans";
     }
 
+    @GetMapping("/clans/{clanId}")
+    public String clan(@PathVariable Long clanId, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member){
+        Clan clan = clanService.findClanById(clanId);
+        model.addAttribute("clan", clan);
+        model.addAttribute("member", member);
+        return "clan/clan";
+    }
+
     @GetMapping("/clans/clanSave")
     public String clanSave(@ModelAttribute ClanForm clanForm, Model model){
         return "clan/clanSave";
@@ -40,6 +47,20 @@ public class ClanController {
         clan.setClanName(clanForm.getClanName());
         clan.setLeaderName(clanForm.getLeaderName());
         clanService.saveClan(clan);
+        return "redirect:/clans";
+    }
+
+    @GetMapping("/clans/signup/{clanId}")
+    public String signup(@PathVariable Long clanId, Model model){
+        Clan clan = clanService.findClanById(clanId);
+        model.addAttribute("clan", clan);
+        return "clan/signup";
+    }
+    @PostMapping("/clans/signup/{clanId}")
+    public String postSignup(@PathVariable Long clanId, @ModelAttribute ClanForm clanForm,
+                             @SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member){
+        Clan clan = clanService.findClanById(clanId);
+        clanService.signupClan(clan,member);
         return "redirect:/clans";
     }
 
