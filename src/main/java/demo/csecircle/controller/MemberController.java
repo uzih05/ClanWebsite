@@ -9,11 +9,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -33,8 +32,13 @@ public class MemberController {
     }
 
     @PostMapping("member/register")
-    public String register(@ModelAttribute Member member) {
+    public String register(@ModelAttribute Member member, @RequestParam("image") MultipartFile image) throws IOException {
+
         Member registerMember = makeMember(member);
+        if (!image.isEmpty()) {
+            byte[] imageBytes = image.getBytes();
+            registerMember.setProfileImage(imageBytes);
+        }
         loginService.register(registerMember);
         return "redirect:/";
     }

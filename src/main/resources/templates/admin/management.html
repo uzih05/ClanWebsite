@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Management - University Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13"></script>
+  <style>
+    .header-container {
+      padding: 16px;
+      background: white;
+      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .profile-image {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="min-h-screen">
+  <!-- Header -->
+  <div class="header-container">
+    <div class="header-content">
+      <div class="profile-section">
+        <img th:if="${currentMember != null && currentMember.profileImage != null}"
+             th:src="@{'/api/members/' + ${currentMember.id} + '/profile-image'}"
+             class="profile-image"
+             alt="Profile">
+        <span th:text="${currentMember != null ? currentMember.name : 'Guest'}"
+              class="text-gray-700 text-sm font-medium">Guest</span>
+      </div>
+      <form th:action="@{/logout}" method="post" class="m-0">
+        <button type="submit" class="text-gray-700 text-sm hover:text-gray-900">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Stats Section -->
+    <div class="px-4 sm:px-0">
+      <h1 class="text-2xl font-semibold text-gray-900">Member Management</h1>
+      <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <i class="fas fa-users text-indigo-600 text-2xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500">Total Members</dt>
+                  <dd class="text-lg font-semibold text-gray-900" th:text="${totalMembers}">0</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <i class="fas fa-crown text-yellow-400 text-2xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500">Club Presidents</dt>
+                  <dd class="text-lg font-semibold text-gray-900" th:text="${clubPresidents}">0</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <i class="fas fa-code text-indigo-600 text-2xl"></i>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500">Website Admins</dt>
+                  <dd class="text-lg font-semibold text-gray-900" th:text="${websiteAdmins}">0</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member List Section -->
+    <div class="mt-8">
+      <div class="bg-white shadow rounded-lg">
+        <!-- Search and Filter -->
+        <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+          <div class="flex flex-wrap items-center justify-between sm:flex-nowrap">
+            <form th:action="@{/admin/members}" method="get" class="flex-grow max-w-xl relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              <input type="text"
+                     name="search"
+                     th:value="${searchQuery}"
+                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm"
+                     placeholder="Search members...">
+            </form>
+            <div class="flex items-center space-x-3">
+              <select name="role"
+                      th:value="${selectedRole}"
+                      class="block pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md">
+                <option value="">All Roles</option>
+                <option th:each="role : ${roles}"
+                        th:value="${role}"
+                        th:text="${role.name()}"
+                        th:selected="${role == selectedRole}">Role</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Member List -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Major</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="memberDTO : ${members}">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="h-10 w-10 flex-shrink-0">
+                    <img th:if="${memberDTO.base64Image != null}"
+                         th:src="'data:image/jpeg;base64,' + ${memberDTO.base64Image}"
+                         class="h-10 w-10 rounded-full"
+                         alt="">
+                    <div th:unless="${memberDTO.base64Image != null}"
+                         class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                      <i class="fas fa-user text-gray-400"></i>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900" th:text="${memberDTO.member.name}">Name</div>
+                    <div class="text-sm text-gray-500" th:text="${memberDTO.member.email}">Email</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <!-- 기타 필드 내용 -->
+              </td>
+            <td>
+                <select th:data-member-id="${memberDTO.member.id}"
+                        class="role-select block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md">
+                  <option th:each="role : ${roles}"
+                          th:value="${role}"
+                          th:text="${role.name()}"
+                          th:selected="${role == memberDTO.getMember().memberRole}">Role</option>
+                </select>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${memberDTO.member.major}">Major</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${memberDTO.member.grade}">Grade</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button type="button"
+                        th:data-member-id="${memberDTO.member.id}"
+                        class="text-red-600 hover:text-red-900 delete-member">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Save Button -->
+        <div class="bg-white px-4 py-3 border-t border-gray-200">
+          <div class="flex justify-end">
+            <button type="button" id="save-changes" class="bg-black text-white rounded px-4 py-2 flex items-center space-x-2 hover:bg-gray-900">
+              <i class="fas fa-save"></i>
+              <span class="font-['Segoe_UI_Symbol']">Save Changes</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div class="flex-1 flex justify-between sm:hidden">
+            <a th:if="${pagination.hasPrevious()}"
+               th:href="@{/admin/members(page=${pagination.number - 1},search=${searchQuery},role=${selectedRole})}"
+               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+            <a th:if="${pagination.hasNext()}"
+               th:href="@{/admin/members(page=${pagination.number + 1},search=${searchQuery},role=${selectedRole})}"
+               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                Showing
+                <span class="font-medium" th:text="${pagination.number * pagination.size + 1}">1</span>
+                to
+                <span class="font-medium" th:text="${paginationResult}">10</span>
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a th:if="${pagination.hasPrevious()}"
+                   th:href="@{/admin/members(page=${pagination.number - 1},search=${searchQuery},role=${selectedRole})}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Previous</span>
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+                <a th:href="@{/admin/members(page=${pageNum - 1},search=${searchQuery},role=${selectedRole})}"
+                   th:each="pageNum : ${#numbers.sequence(1, pagination.totalPages)}"
+                   th:class="${pageNum - 1 == pagination.number} ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'"
+                   th:text="${pageNum}">1</a>
+                <a th:if="${pagination.hasNext()}"
+                   th:href="@{/admin/members(page=${pagination.number + 1},search=${searchQuery},role=${selectedRole})}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Next</span>
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Track changes made to roles
+    let pendingChanges = new Map();
+
+    // Handle role changes
+    document.querySelectorAll('.role-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const memberId = this.dataset.memberId;
+        const newRole = this.value;
+        pendingChanges.set(memberId, newRole);
+      });
+    });
+
+    // Handle save changes button
+    document.getElementById('save-changes').addEventListener('click', async function() {
+      if (pendingChanges.size === 0) {
+        alert('No changes to save');
+        return;
+      }
+
+      try {
+        // Send each role update individually as per the controller endpoint
+        for (const [memberId, role] of pendingChanges) {
+          const formData = new URLSearchParams();
+          formData.append('role', role);
+
+          const response = await fetch(`/admin/members/${memberId}/role`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to update role for member ${memberId}`);
+          }
+
+          const result = await response.text();
+          if (result === 'Unauthorized') {
+            alert('You are not authorized to perform this action');
+            return;
+          }
+        }
+
+        // Clear pending changes after successful save
+        pendingChanges.clear();
+        alert('Changes saved successfully');
+
+      } catch (error) {
+        console.error('Error saving changes:', error);
+        alert('Failed to save changes. Please try again.');
+      }
+    });
+
+    // Handle member deletion
+    document.querySelectorAll('.delete-member').forEach(button => {
+      button.addEventListener('click', async function() {
+        const memberId = this.dataset.memberId;
+
+        if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
+          return;
+        }
+
+        try {
+          const response = await fetch('/admin/members/delete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify([memberId])
+          });
+
+          if (!response.ok) throw new Error('Failed to delete member');
+
+          const result = await response.text();
+          if (result === 'Unauthorized') {
+            alert('You are not authorized to perform this action');
+            return;
+          }
+
+          if (result === 'Success') {
+            // Remove the row from the table
+            const row = this.closest('tr');
+            row.remove();
+
+            // Update the total count display
+            const totalMembersElement = document.querySelector('.total-members');
+            if (totalMembersElement) {
+              const currentTotal = parseInt(totalMembersElement.textContent);
+              totalMembersElement.textContent = currentTotal - 1;
+            }
+
+            // Show success message
+            alert('Member deleted successfully');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Failed to delete member');
+        }
+      });
+    });
+
+    // Handle batch deletion
+    const deleteSelectedButton = document.getElementById('delete-selected');
+    if (deleteSelectedButton) {
+      deleteSelectedButton.addEventListener('click', async function() {
+        const selectedMembers = Array.from(document.querySelectorAll('input[name="selected-members"]:checked'))
+                .map(checkbox => checkbox.value);
+
+        if (selectedMembers.length === 0) {
+          alert('Please select at least one member to delete');
+          return;
+        }
+
+        if (!confirm(`Are you sure you want to delete ${selectedMembers.length} member(s)? This action cannot be undone.`)) {
+          return;
+        }
+
+        try {
+          const response = await fetch('/admin/members/delete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(selectedMembers)
+          });
+
+          if (!response.ok) throw new Error('Failed to delete members');
+
+          const result = await response.text();
+          if (result === 'Unauthorized') {
+            alert('You are not authorized to perform this action');
+            return;
+          }
+
+          if (result === 'Success') {
+            // Remove the selected rows
+            selectedMembers.forEach(memberId => {
+              const row = document.querySelector(`tr[data-member-id="${memberId}"]`);
+              if (row) row.remove();
+            });
+
+            // Update the total count display
+            const totalMembersElement = document.querySelector('.total-members');
+            if (totalMembersElement) {
+              const currentTotal = parseInt(totalMembersElement.textContent);
+              totalMembersElement.textContent = currentTotal - selectedMembers.length;
+            }
+
+            // Show success message
+            alert('Selected members deleted successfully');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Failed to delete selected members');
+        }
+      });
+    }
+
+    // Handle "Select All" functionality
+    const selectAllCheckbox = document.getElementById('select-all');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="selected-members"]');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = this.checked;
+        });
+      });
+    }
+  });
+</script>

@@ -1,6 +1,7 @@
 package demo.csecircle.controller.form;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class ClanForm {
@@ -11,6 +12,8 @@ public class ClanForm {
     private String meetingTime;
     private String clanLocation;
     private String telNum;
+    private MultipartFile image;
+    private MultipartFile document;
 
     public ClanForm() {
     }

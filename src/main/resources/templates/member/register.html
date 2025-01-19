@@ -28,8 +28,16 @@
         </div>
 
         <!-- 회원가입 폼 -->
-        <form th:action="@{/member/register}" method="post" class="space-y-4" onsubmit="return validateForm()">
+        <form th:action="@{/member/register}" method="post" class="space-y-4" onsubmit="return validateForm()" enctype="multipart/form-data">
             <!-- 이메일 입력 -->
+            <div class="upload-section">
+                <!-- 이미지 업로드 -->
+                <label for="image-upload" class="upload-box">
+                    <img class="logo-image" th:src="@{/images/jpg.png}" alt="이미지 없음">
+
+                </label>
+                <input type="file" id="image-upload" name="image" accept="image/*" style="display: none;" onchange="updateLabel('image')">            </div>
+
             <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-400">
                         <i class="far fa-envelope"></i>

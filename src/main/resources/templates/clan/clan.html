@@ -156,14 +156,14 @@
                              transition: background-color 0.3s, transform 0.2s; /* 호버 시 색상 변경 및 크기 변화 */
                          }
 
-            .join-btn-text {
-                color: white;
-                font-size: 18px; /* 글씨 크기 증가 */
-                font-family: Segoe UI Symbol, sans-serif;
-                font-weight: 600; /* 글씨 두껍게 */
-                text-align: center;
-                word-wrap: break-word;
-            }
+        .join-btn-text {
+            color: white;
+            font-size: 18px; /* 글씨 크기 증가 */
+            font-family: Segoe UI Symbol, sans-serif;
+            font-weight: 600; /* 글씨 두껍게 */
+            text-align: center;
+            word-wrap: break-word;
+        }
 
         /* (6) 소개 */
         .introduce-title {
@@ -311,7 +311,7 @@
 
         <!-- (2) 로고 영역 -->
         <div class="logo-container">
-            <img class="logo-image" th:src="@{/images/default-logo.gif}" alt="Clan Logo">
+            <img class="logo-image" th:src="'data:image/jpeg;base64,' + ${base64Image}" alt="이미지 없음">
         </div>
 
         <!-- (3) 리더/설립년도 -->
@@ -397,6 +397,13 @@
                 <span class="info-detail" th:text="${clan.telNum}">
             전화번호든 이메일이든 카톡
           </span>
+            </div>
+        </div>
+        <div><!-- 문서 다운로드 버튼 -->
+            <div th:if="${clan.document != null}">
+                <a th:href="@{/clans/downloadDocument/{clanId}(clanId=${clan.id})}">
+                    <button class="join-btn">문서 다운로드</button>
+                </a>
             </div>
         </div>
 
