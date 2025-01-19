@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동아리 수정하기</title>
+    <style>
+        .logo-image {
+            max-width: 40px;
+            max-height: 40px;
+            margin-bottom: 8px;
+            font-size: 7px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #F9FAFB;
+            font-family: 'Segoe UI Symbol', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-container {
+            width: 402px;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            justify-content: space-between;
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #374151;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .content-wrapper {
+            padding: 16px;
+        }
+
+        .title {
+            color: #111827;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #4B5563;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 8px;
+            font-size: 14px;
+            color: #6B7280;
+            border: 1px solid #D1D5DB;
+            border-radius: 4px;
+        }
+
+        .textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .upload-box {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #D1D5DB;
+            border-radius: 8px;
+            color: #9CA3AF;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .info {
+            color: #6B7280;
+            font-size: 12px;
+        }
+
+        .upload-label {
+            display: block;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-exit {
+            color: #374151;
+            border: 1px solid #D1D5DB;
+            background: white;
+        }
+
+        .btn-submit {
+            color: white;
+            background: black;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+
+    <!-- 상단 바 -->
+    <div class="top-bar">
+        <span th:text="${member != null ? member.name : 'Guest'}"
+              style="color: #374151; font-size: 14px;">John Smith</span>
+        <div class="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </div>
+    </div>
+
+    <!-- 콘텐츠 -->
+    <div class="content-wrapper">
+        <h1 class="title">동아리 수정하기</h1>
+        <p class="description">
+            동아리 정보를 수정하려면 아래 세부 정보를 업데이트하세요.
+        </p>
+
+        <!-- 타임리프 폼 -->
+        <form class="form-container"
+              th:object="${clanForm}" th:action="@{/clans/{clanId}/edit(clanId=${clan.id})}"
+              method="post" enctype="multipart/form-data">
+
+            <!-- 아이콘 및 문서 업로드 -->
+            <div class="upload-section">
+                <!-- 이미지 업로드 -->
+                <label for="image-upload" class="upload-box">
+                    <img class="logo-image" th:src="@{/images/jpg.png}" alt="이미지 없음">
+                </label>
+                <input type="file" id="image-upload" name="image" accept="image/*" style="display: none;">
+
+                <!-- 문서 업로드 -->
+                <label for="document-upload" class="upload-box">
+                    <img class="logo-image" th:src="@{/images/document.jpg}" alt="이미지 없음">
+                </label>
+                <input type="file" id="document-upload" name="document" accept=".docx" style="display: none;">
+            </div>
+
+            <!-- 동아리 이름 -->
+            <div class="form-group">
+                <label class="form-label">동아리 이름 *</label>
+                <input type="text" class="form-input" th:field="*{clanName}" placeholder="Enter club name">
+            </div>
+
+            <!-- 동아리 회장님 이름 -->
+            <div class="form-group">
+                <label class="form-label">동아리 회장님 이름 *</label>
+                <input type="text" class="form-input" th:field="*{leaderName}" placeholder="Enter leader name">
+            </div>
+
+            <!-- 연락처 -->
+            <div class="form-group">
+                <label class="form-label">연락처 *</label>
+                <input type="text" class="form-input" th:field="*{telNum}" placeholder="Enter contact number">
+            </div>
+
+            <!-- 동아리 위치 -->
+            <div class="form-group">
+                <label class="form-label">동아리방 위치 *</label>
+                <input type="text" class="form-input" th:field="*{clanLocation}" placeholder="Enter location">
+            </div>
+
+            <!-- 모임 시간 -->
+            <div class="form-group">
+                <label class="form-label">모임 시간 *(없으면 X)</label>
+                <input type="text" class="form-input" th:field="*{meetingTime}" placeholder="e.g., Every Monday 5:00 PM">
+            </div>
+
+            <!-- 동아리 설명 -->
+            <div class="form-group">
+                <label class="form-label">동아리 설명 *</label>
+                <textarea class="form-input textarea" th:field="*{description}"
+                          placeholder="동아리의 목적, 활동, 요구 사항 및 추가 정보에 대해 자유롭게 기재해주세요.">
+                </textarea>
+            </div>
+
+            <!-- 버튼 그룹 -->
+            <div class="button-group">
+                <a href="/" class="btn btn-exit">나가기</a>
+                <button type="submit" class="btn btn-submit">수정하기</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+</body>
+</html>

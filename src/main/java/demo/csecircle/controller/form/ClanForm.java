@@ -14,6 +14,7 @@ public class ClanForm {
     private String telNum;
     private MultipartFile image;
     private MultipartFile document;
+    private Long id;
 
     public ClanForm() {
     }

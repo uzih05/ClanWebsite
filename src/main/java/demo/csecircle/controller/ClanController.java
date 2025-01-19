@@ -2,6 +2,7 @@ package demo.csecircle.controller;
 
 import demo.csecircle.UserConst;
 import demo.csecircle.classification.ClanRecruit;
+import demo.csecircle.classification.MemberRole;
 import demo.csecircle.controller.form.ClanForm;
 import demo.csecircle.controller.form.ClanSearchForm;
 import demo.csecircle.domain.Clan;
@@ -40,6 +41,11 @@ public class ClanController {
 
     @GetMapping("/clans/{clanId}")
     public String clan(@PathVariable Long clanId, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member){
+        boolean isPresident = member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT);
+        boolean isAdmin = member.getMemberRole().equals(MemberRole.WEBSITE_ADMIN);
+        if(isPresident || isAdmin){
+            model.addAttribute("isAdmin", true);
+        }
         Clan clan = clanService.findClanById(clanId);
         if (clan.getImage() != null) {
             String base64Image = Base64.getEncoder().encodeToString(clan.getImage());
@@ -119,6 +125,58 @@ public class ClanController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    @GetMapping("/clans/{clanId}/edit")
+    public String edit(@PathVariable Long clanId, Model model,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member){
+        Clan clan = clanService.findClanById(clanId);
+        boolean isAdmin = member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT);
+        model.addAttribute("member", member);
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("clanForm", makeEditClanForm(clan));
+        model.addAttribute("clan", clan);
+        return "clan/clanEdit";
+    }
+
+    public ClanForm makeEditClanForm(Clan clan){
+        ClanForm clanForm = new ClanForm();
+        clanForm.setClanName(clan.getClanName());
+        clanForm.setLeaderName(clan.getLeaderName());
+        clanForm.setClanLocation(clan.getClanLocation());
+        clanForm.setTelNum(clan.getTelNum());
+        clanForm.setMeetingTime(clan.getMeetingTime());
+        clanForm.setDescription(clan.getDescription());
+        clanForm.setId(clan.getId());
+        return clanForm;
+    }
+
+    @PostMapping("/clans/{clanId}/edit")
+    public String editPost(@PathVariable Long clanId, @ModelAttribute ClanForm clanForm, @RequestParam("image") MultipartFile image,
+                           @RequestParam("document") MultipartFile document,
+                           Model model) throws IOException {
+
+        Clan clan = clanService.findClanById(clanId);
+        clan.setClanName(clanForm.getClanName());
+        clan.setLeaderName(clanForm.getLeaderName());
+        clan.setClanLocation(clanForm.getClanLocation());
+        clan.setTelNum(clanForm.getTelNum());
+        clan.setMeetingTime(clanForm.getMeetingTime());
+        clan.setDescription(clanForm.getDescription());
+        // 이미지가 있으면 업데이트
+        if (image != null && !image.isEmpty()) {
+            byte[] imageBytes = image.getBytes();
+            clan.setImage(imageBytes);
+        }
+
+        // 문서가 있으면 업데이트
+        if (document != null && !document.isEmpty()) {
+            byte[] documentBytes = document.getBytes();
+            clan.setDocument(documentBytes);
+        }
+        clanService.saveClan(clan);
+
+        return "redirect:/clans/{clanId}";
+
     }
 
 
