@@ -9,6 +9,7 @@ import demo.csecircle.domain.Clan;
 import demo.csecircle.domain.Member;
 import demo.csecircle.service.ClanService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class ClanController {
 
     private final ClanService clanService;
@@ -47,6 +49,11 @@ public class ClanController {
             model.addAttribute("isAdmin", true);
         }
         Clan clan = clanService.findClanById(clanId);
+
+        if(clan.getIsRecruit().equals(ClanRecruit.YES) && member.getSignupClan() == null
+                && !clan.getSignupMembers().contains(member)){
+            model.addAttribute("isRecruit", true);
+        }
         if (clan.getImage() != null) {
             String base64Image = Base64.getEncoder().encodeToString(clan.getImage());
             model.addAttribute("base64Image", base64Image);
@@ -178,6 +185,99 @@ public class ClanController {
         return "redirect:/clans/{clanId}";
 
     }
+
+    @GetMapping("/clans/{clanId}/manage")
+    public String manage(@PathVariable Long clanId, Model model,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member){
+        Clan clan = clanService.findClanById(clanId);
+        model.addAttribute("member", member);
+
+        if (clan.getImage() != null) {
+            String base64Image = Base64.getEncoder().encodeToString(clan.getImage());
+            model.addAttribute("base64Image", base64Image);
+        }
+
+        if (member.getProfileImage() != null) {
+            String base64Image = Base64.getEncoder().encodeToString(member.getProfileImage());
+            model.addAttribute("base64ImageM", base64Image);
+        }
+        boolean isRecruit = clan.getIsRecruit().equals(ClanRecruit.YES);
+        model.addAttribute("isRecruit", isRecruit);
+        model.addAttribute("clan", clan);
+        return "clan/clanManage";
+    }
+
+    @PostMapping("/clans/{clanId}/recruitChange")
+    public String changeRecruit(@PathVariable Long clanId,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member){
+        if(member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT) || member.getMemberRole().equals(MemberRole.WEBSITE_ADMIN)){
+            Clan clan = clanService.findClanById(clanId);
+            if(clan.getIsRecruit().equals(ClanRecruit.YES)){
+                clan.setIsRecruit(ClanRecruit.NO);
+            }
+            else if(clan.getIsRecruit().equals(ClanRecruit.NO)){
+                clan.setIsRecruit(ClanRecruit.YES);
+            }
+            clanService.saveClan(clan);
+            return "redirect:/clans/{clanId}/manage";
+        }
+        return "redirect:/clans/{clanId}/manage";
+    }
+
+    @PostMapping("/clans/{clanId}/addWaitingMember")
+    public String addMember(@PathVariable Long clanId, @ModelAttribute Member member){
+        return "redirect:/clans/{clanId}/manage";
+    }
+
+    @PostMapping("/clans/{clanId}/signupMember/{applicantId}/approve")
+    @ResponseBody
+    public ResponseEntity<String> approveApplicant(@PathVariable Long clanId, @PathVariable Long applicantId) {
+        Clan clan = clanService.findClanById(clanId);  // 클럽 정보 조회
+
+        if (clan == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Clan not found");
+        }
+
+        Member applicant = clan.getSignupMembers().stream()
+                .filter(member -> member.getId().equals(applicantId))
+                .findFirst()
+                .orElse(null);
+
+        if (applicant == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Applicant not found");
+        }
+
+        // 승인 처리 로직
+        clanService.acceptMember(clan,applicant);
+        log.info("accepted applicant " + applicantId);
+
+        return ResponseEntity.ok("Applicant approved");
+    }
+
+    @PostMapping("/clans/{clanId}/signupMember/{applicantId}/reject")
+    @ResponseBody
+    public ResponseEntity<String> rejectApplicant(@PathVariable Long clanId, @PathVariable Long applicantId) {
+        Clan clan = clanService.findClanById(clanId);  // 클럽 정보 조회
+
+        if (clan == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Clan not found");
+        }
+
+        Member applicant = clan.getSignupMembers().stream()
+                .filter(member -> member.getId().equals(applicantId))
+                .findFirst()
+                .orElse(null);
+
+        if (applicant == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Applicant not found");
+        }
+
+        // 거부 처리 로직
+        clanService.rejectMember(clan,applicant);
+        log.info("rejected applicant " + applicantId);
+        log.info("clan Name" + clan.getClanName());
+        log.info("applicant " + applicant.getName());
+        return ResponseEntity.ok("Applicant rejected");
+    }
+
 
 
 

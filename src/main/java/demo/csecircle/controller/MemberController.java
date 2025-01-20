@@ -5,22 +5,29 @@ import demo.csecircle.domain.Clan;
 import demo.csecircle.domain.Member;
 import demo.csecircle.service.ClanService;
 import demo.csecircle.service.LoginService;
+import demo.csecircle.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final LoginService loginService;
     private final ClanService clanService;
+    private final MemberService memberService;
 
 
     @GetMapping("member/register")
@@ -62,6 +69,65 @@ public class MemberController {
         model.addAttribute("clanList",clans);
         model.addAttribute("member",member);
         return "member/myPage";
+    }
+
+    @GetMapping("/clans/{clanId}/member/{memberId}")
+    @ResponseBody
+    public Member getMemberDetails(@PathVariable Long clanId, @PathVariable Long memberId) {
+        return memberService.findMemberById(memberId); // 멤버 객체를 JSON 형식으로 반환
+    }
+
+    @GetMapping("/clans/{clanId}/signupMember/{applicantId}")
+    @ResponseBody
+    public Member getApplicantDetails(@PathVariable Long clanId, @PathVariable Long applicantId) {
+        Clan clan = clanService.findClanById(clanId); // 클럽 정보 찾기
+
+        if (clan == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Clan not found"); // 클럽이 없으면 404 에러
+        }
+
+        return clan.getSignupMembers().stream()
+                .filter(member -> member.getId().equals(applicantId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Applicant not found")); // 신청자 정보 반환
+    }
+
+//    // 멤버 역할 수정
+//    @PutMapping("/{memberId}/role")
+//    public ResponseEntity<?> editRole(@PathVariable Long memberId, @RequestBody RoleRequest roleRequest) {
+//        try {
+//            clubService.updateMemberRoleById(memberId, roleRequest.getRole());
+//            return ResponseEntity.ok(new ApiResponse(true, "Role updated successfully"));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(400).body(new ApiResponse(false, "Failed to update role"));
+//        }
+//    }
+
+    @DeleteMapping("/clans/{clanId}/members/{memberId}")
+    public ResponseEntity<?> deleteMember(@PathVariable Long clanId, @PathVariable Long memberId) {
+        log.info("Delete request received for memberId: {} from clanId: {}", memberId, clanId);
+
+        try {
+            // Find the clan by ID
+            Clan clan = clanService.findClanById(clanId);
+            if (clan == null) {
+                return ResponseEntity.status(404).body("Clan not found");
+            }
+
+            // Find the member by ID
+            Member memberById = memberService.findMemberById(memberId);
+            if (memberById == null || !memberById.getClan().equals(clan)) {
+                return ResponseEntity.status(404).body("Member not found in the specified clan");
+            }
+
+            // Delete the member from the clan
+            clanService.deleteMember(clan, memberById);
+
+            return ResponseEntity.ok("Member deleted successfully");
+        } catch (Exception e) {
+            log.error("Error deleting member: {}", e.getMessage());
+            return ResponseEntity.status(400).body("Failed to delete member");
+        }
     }
 
 }

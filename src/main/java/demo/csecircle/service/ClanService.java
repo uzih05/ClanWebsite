@@ -39,11 +39,37 @@ public class ClanService {
     }
 
     public void signupClan(Clan clan, Member member){
+        if(member.getClan()!=null){
+            return;
+        }
         clan.getSignupMembers().add(member);
         clanRepository.save(clan);
         member.setSignupClan(clan);
         memberRepository.save(member);
     }
+
+    public void acceptMember(Clan clan, Member member){
+        clan.getMembers().add(member);
+        clan.getSignupMembers().remove(member);
+        member.setSignupClan(null);
+        member.setClan(clan);
+        memberRepository.save(member);
+        clanRepository.save(clan);
+    }
+    public void rejectMember(Clan clan, Member member){
+        clan.getSignupMembers().remove(member);
+        member.setSignupClan(null);
+        memberRepository.save(member);
+        clanRepository.save(clan);
+    }
+    public void deleteMember(Clan clan, Member member){
+        clan.getMembers().remove(member);
+        member.setClan(null);
+        memberRepository.save(member);
+        clanRepository.save(clan);
+    }
+
+
 
 
 

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Club Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+<div class="flex flex-col items-center min-h-screen">
+    <!-- Top Navigation -->
+    <div class="w-full h-16 bg-white shadow-sm">
+        <div class="max-w-md mx-auto h-full px-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img th:src="'data:image/jpeg;base64,' + ${base64ImageM}" alt="Club" class="w-full h-full object-cover">
+                <span class="text-gray-700 text-sm">John Smith</span>
+            </div>
+            <button class="text-gray-700 text-sm flex items-center gap-1">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-md w-full px-4 py-5 flex flex-col gap-5">
+        <!-- Club Header -->
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden">
+                    <img th:src="'data:image/jpeg;base64,' + ${base64Image}" alt="Club" class="w-full h-full object-cover">
+                </div>
+                <h1 class="text-xl text-gray-900" th:text="${clan.clanName}">동아리 이름</h1>
+            </div>
+            <button class="px-4 py-3 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                <i class="fas fa-edit"></i>
+                <span>동아리 수정하기</span>
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex flex-col gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-5">
+                <div class="flex items-center gap-5">
+                    <i class="fas fa-users text-2xl"></i>
+                    <div>
+                        <div class="text-gray-500 text-sm">총 회원</div>
+                        <div class="text-lg text-gray-900" th:text="${clan.getMembers().size() + '명'}">42</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-5">
+                <div class="flex items-center gap-5">
+                    <div class="flex items-center justify-center">
+                        <!-- Toggle Switch Container -->
+                        <label class="relative inline-block w-[34px] h-[18px] cursor-pointer">
+                            <input type="checkbox"
+                                   class="hidden peer"
+                                   th:checked="${isRecruit}"
+                                   onchange="toggleRecruitment(this.checked, [[${clan.id}]])">
+                            <div class="absolute inset-0 rounded-[10px] transition-colors duration-300
+                    bg-gray-200 peer-checked:bg-green-500"></div>
+                            <div class="absolute left-[2px] top-[2px] w-[14px] h-[14px] rounded-full bg-white
+                    transition-transform duration-300 peer-checked:translate-x-[16px] shadow"></div>
+                        </label>
+                    </div>
+                    <div class="flex-grow flex items-center justify-between">
+                        <div>
+                            <div class="text-gray-500 text-sm">모집 여부</div>
+                            <div class="text-lg" th:classappend="${isRecruit ? 'text-green-600' : 'text-gray-600'}"
+                                 th:text="${isRecruit ? '현재 모집중' : '모집 종료'}">
+                                현재 모집중
+                            </div>
+                        </div>
+                        <form th:action="@{/clans/{clanId}/recruitChange(clanId=${clan.id})}" method="post" class="inline">
+                            <button type="submit" class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50">
+        <span th:text="${isRecruit ? '모집 종료하기' : '모집 시작하기'}">
+            모집 종료하기
+        </span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Members -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-4 py-3.5 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg text-gray-900">현재 회원</h2>
+                <button class="px-4 py-2 bg-black text-white rounded flex items-center gap-2 text-sm">
+                    <i class="fas fa-plus text-sm"></i>
+                    <span>회원 추가하기</span>
+                </button>
+            </div>
+            <div class="overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Name</th>
+                        <th class="px-6 py-3 text-left">Student ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    <tr th:each="member : ${clan.getMembers()}"
+                        class="hover:bg-gray-50 cursor-pointer"
+                        th:attr="onclick='showMemberModal(' + ${member.id} + ', ' + ${clan.id} + ')'">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900" th:text="${member.name}">Sarah Wilson</div>
+                                    <div class="text-sm text-gray-500" th:text="${member.email}">sarah.wilson@university.edu</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500" th:text="${member.loginId}">STU001234</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pending Members -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-4 py-5 border-b border-gray-200">
+                <h2 class="text-lg text-gray-900">대기중인 회원</h2>
+            </div>
+            <div class="overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Name</th>
+                        <th class="px-6 py-3 text-left">Student ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    <tr th:each="applicant : ${clan.signupMembers}"
+                        class="hover:bg-gray-50 cursor-pointer"
+                        th:attr="onclick='showApplicantModal(\'' + ${applicant.id} + '\')'">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900" th:text="${applicant.name}">Emily Johnson</div>
+                                    <div class="text-sm text-gray-500" th:text="${applicant.email}">emily.johnson@university.edu</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500" th:text="${applicant.loginId}">STU009012</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Applicant Modal -->
+        <div id="applicantModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" th:each="applicant : ${clan.getSignupMembers()}">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <h3 class="text-lg font-medium mb-4" id="modalApplicantName"></h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-gray-500" th:text="${applicant.memberRole}">역할</label>
+                            <p id="modalApplicantRole" class="font-medium"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-500"th:text="${applicant.grade}">학년</label>
+                            <p id="modalApplicantJoinDate" class="font-medium"></p>
+                        </div>
+                        <!-- Approve and Reject Buttons -->
+                        <button th:attr="onclick='approveApplicant(' + ${applicant.id} + ', ' + ${clan.id} + ')'" class="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                            Approve
+                        </button>
+                        <button th:attr="onclick='rejectApplicant(' + ${applicant.id} + ', ' + ${clan.id} + ')'" class="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                            Reject
+                        </button>
+                        <button onclick="closeApplicantModal()" class="w-full mt-4 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Bottom Save Button -->
+    <div class="w-full bg-white shadow-sm py-4 mt-auto">
+        <div class="max-w-md mx-auto px-8">
+            <a th:href="@{/clans/{clanId}(clanId=${clan.id})}" class="w-full bg-black text-white rounded py-2.5 flex items-center justify-center gap-2">
+                <i class="fas fa-save"></i>
+                <span>돌아가기</span>
+            </a>
+        </div>
+    </div>
+
+        <!-- Member Modal -->
+        <div id="memberModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" th:each="member:${clan.getMembers()}">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <h3 class="text-lg font-medium mb-4" id="modalMemberName"></h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-gray-500">Role</label>
+                            <p id="modalMemberRole" class="font-medium"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-500">Join Date</label>
+                            <p id="modalMemberJoinDate" class="font-medium"></p>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="editRole()" class="flex-1 px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+                                Edit Role
+                            </button>
+                            <!-- Delete Button with data-id -->
+                            <button th:attr="onclick='deleteMember(' + ${member.id} + ', ' + ${clan.id} + ')'" data-id="${exist.id}" class="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                Delete
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" class="w-full mt-4 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<script>
+    function toggleRecruitment(isRecruiting) {
+        fetch(`/clans/${clanId}/recruitChange`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ isRecruiting })
+        })
+            .then(response => response.text())
+            .then(result => {
+                if (result === "success") {
+                    alert('모집 상태가 변경되었습니다.');
+                    location.reload();
+                } else {
+                    alert('권한이 없습니다.');
+                }
+            })
+            .catch(error => console.error('Error updating recruitment status:', error));
+    }
+
+    function showMemberModal(memberId, clanId) {
+        fetch(`/api/member/${memberId}`)
+            .then(response => response.json())
+            .then(member => {
+                const modal = document.getElementById('memberModal');
+                const memberName = document.getElementById('modalMemberName');
+                const memberRole = document.getElementById('modalMemberRole');
+                const memberJoinDate = document.getElementById('modalMemberJoinDate');
+
+                // Modal에 memberId와 clanId를 데이터로 설정
+                modal.setAttribute('data-member-id', member.id);
+                modal.setAttribute('data-clan-id', clanId);  // clanId도 저장
+
+                memberName.textContent = member.name;
+                memberRole.textContent = member.role;
+                memberJoinDate.textContent = member.grade;
+
+                modal.classList.remove('hidden');
+            })
+            .catch(error => console.error("Error fetching member data:", error));
+    }
+    function deleteMember(memberId,clanId) {
+
+
+        if (confirm("Are you sure you want to delete this member?")) {
+            fetch(`/clans/${clanId}/members/${memberId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Member deleted successfully');
+                        closeModal();
+                        location.reload();  // 페이지 리로드
+                    } else {
+                        alert('Failed to delete member');
+                    }
+                })
+                .catch(error => console.error('Error deleting member:', error));
+        }
+    }
+
+
+    function closeModal() {
+        document.getElementById('memberModal').classList.add('hidden');
+    }
+
+    function editRole() {
+        const memberId = document.getElementById('modalMemberName').textContent;
+        const newRole = prompt("Enter the new role for the member:", "Member");
+
+        if (newRole) {
+            fetch(`/api/member/${memberId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ role: newRole })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Role updated successfully');
+                        closeModal();
+                        location.reload(); // 페이지 리로드하여 수정된 내용 반영
+                    } else {
+                        alert('Failed to update role');
+                    }
+                })
+                .catch(error => console.error('Error updating role:', error));
+        }
+    }
+
+
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('memberModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+    function showApplicantModal(applicantId, clanId) {
+        fetch(`/api/clans/${clanId}/signupMember/${applicantId}`)
+            .then(response => response.json())
+            .then(applicant => {
+                const modal = document.getElementById('applicantModal');
+                const applicantName = document.getElementById('modalApplicantName');
+                const applicantRole = document.getElementById('modalApplicantRole');
+                const applicantJoinDate = document.getElementById('modalApplicantJoinDate');
+
+                applicantName.textContent = applicant.name;
+                applicantRole.textContent = applicant.role;
+                applicantJoinDate.textContent = applicant.grade;
+
+                modal.classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error("Error fetching applicant data:", error);
+            });
+    }
+    function closeApplicantModal() {
+        document.getElementById('applicantModal').classList.add('hidden');
+    }
+    function approveApplicant(applicantId, clanId) {
+        fetch(`/clans/${clanId}/signupMember/${applicantId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'approved'  // 서버에서 필요한 데이터 형식에 맞게 수정
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("회원 승인");
+                    closeApplicantModal(); // 승인 후 모달 닫기
+                    window.location.href = `/clans/${clanId}/manage`; // 클럽 상세 페이지로 리디렉션
+
+                } else {
+                    throw new Error("승인 실패");
+                }
+            })
+            .catch(error => {
+                console.error("Error approving applicant:", error);
+            });
+    }
+
+    function rejectApplicant(applicantId, clanId) {
+        fetch(`/clans/${clanId}/signupMember/${applicantId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'rejected'  // 서버에서 필요한 데이터 형식에 맞게 수정
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("회원 거부");
+                    closeApplicantModal(); // 거부 후 모달 닫기
+                    window.location.href = `/clans/${clanId}/manage`; // 클럽 상세 페이지로 리디렉션
+
+                } else {
+                    throw new Error("거부 실패");
+                }
+            })
+            .catch(error => {
+                console.error("Error rejecting applicant:", error);
+            });
+    }
+    window.onclick = function(event) {
+        const modal = document.getElementById('applicantModal');
+        if (event.target === modal) {
+            closeApplicantModal();
+        }
+    }
+</script>
+    </div>
+</body>
+</html>
