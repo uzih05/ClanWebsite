@@ -39,7 +39,9 @@ public class LoginController {
         }
         HttpSession session = request.getSession();
         session.setAttribute(UserConst.LOGIN_MEMBER, loginMember);
-        return "redirect:" + redirectURL;
+
+        // 리디렉션 URL을 검증하여, 세션 정보가 URL에 포함되지 않도록 처리
+        return "redirect:" + (redirectURL != null && !redirectURL.isEmpty() ? redirectURL : "/");
     }
 
     @PostMapping("/logout")

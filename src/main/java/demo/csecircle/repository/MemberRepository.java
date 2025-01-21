@@ -18,4 +18,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "(:search IS NULL OR m.name LIKE %:search% OR m.email LIKE %:search% OR m.loginId LIKE %:search%) " +
             "AND (:role IS NULL OR m.memberRole = :role)")
     Page<Member> findMembersForManagement(String search, MemberRole role, Pageable pageable);
+
+    Member findByEmail(String email);
+
+    Member findMemberByLoginId(String loginId);
+
+    boolean existsByLoginId(String loginId);
+
 }

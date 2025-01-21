@@ -42,11 +42,37 @@ public class MemberController {
         return "member/register";
     }
 
+    @PostMapping("/checkId")
+    @ResponseBody  // JSON 응답을 위해 필수
+    public ResponseEntity<Map<String, String>> checkDuplicateId(@RequestParam String loginId) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            // 중복 확인 메서드 구현 필요
+            boolean isDuplicate = memberService.findMemberByLoginId(loginId);
+            if (isDuplicate) {
+                response.put("message", "이미 사용중인 아이디입니다.");
+                return ResponseEntity.badRequest().body(response);
+            } else {
+                response.put("message", "사용 가능한 아이디입니다.");
+                return ResponseEntity.ok(response);
+            }
+        } catch (Exception e) {
+            log.error("아이디 중복 확인 중 오류: ", e);
+            response.put("message", "아이디 중복 확인 중 오류가 발생했습니다.");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
 
     @PostMapping("/send")
     @ResponseBody
     public ResponseEntity<Map<String, String>> sendVerificationEmail(@RequestParam String email) {
         try {
+            if(memberService.findMemberByEmail(email) != null){
+                Map<String, String> map = new HashMap<>();
+                map.put("message","이미 존재하는 이메일입니다.");
+                return ResponseEntity.badRequest().body(map);
+            }
             mailService.sendVerificationEmail(email);
             Map<String, String> response = new HashMap<>();
             response.put("message", "인증번호가 이메일로 전송되었습니다.");

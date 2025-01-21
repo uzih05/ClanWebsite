@@ -42,5 +42,13 @@ public class MemberService {
     public Member findMemberById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Member not found"));
     }
+
+    public Member findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+    public boolean findMemberByLoginId(String loginId) {
+        return memberRepository.existsByLoginId(loginId);
+    }
 }
 

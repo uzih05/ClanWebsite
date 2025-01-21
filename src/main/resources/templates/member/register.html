@@ -20,6 +20,13 @@
             </div>
         </div>
 
+        <!-- 이메일 인증 상태 메시지 -->
+        <div id="verificationStatus" class="mb-4 hidden">
+            <div class="bg-yellow-50 text-yellow-600 px-4 py-3 rounded-lg">
+                이메일 인증이 필요합니다.
+            </div>
+        </div>
+
         <!-- 서버 에러 메시지 -->
         <div th:if="${param.error}" class="mb-4">
             <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
@@ -29,19 +36,23 @@
 
         <!-- 회원가입 폼 -->
         <form th:action="@{/member/register}" method="post" class="space-y-4" onsubmit="return validateForm()" enctype="multipart/form-data">
-            <!-- 이메일 입력 -->
+            <!-- Hidden inputs -->
+            <input type="hidden" id="emailVerified" name="emailVerified" value="false">
+            <input type="hidden" id="idChecked" value="false">
+
+            <!-- 이미지 업로드 -->
             <div class="upload-section">
-                <!-- 이미지 업로드 -->
                 <label for="image-upload" class="upload-box">
                     <img class="logo-image" th:src="@{/images/jpg.png}" alt="이미지 없음">
-
                 </label>
-                <input type="file" id="image-upload" name="image" accept="image/*" style="display: none;" onchange="updateLabel('image')">            </div>
+                <input type="file" id="image-upload" name="image" accept="image/*" style="display: none;" onchange="updateLabel('image')">
+            </div>
 
+            <!-- 이메일 입력 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="far fa-envelope"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="far fa-envelope"></i>
+                </span>
                 <input type="email"
                        name="email"
                        id="emailForVerification"
@@ -49,19 +60,14 @@
                        class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                        placeholder="이메일">
             </div>
+
+            <!-- 이메일 인증 섹션 -->
             <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 w-full max-w-md">
                 <h2 class="text-xl font-semibold text-center mb-4">이메일 인증</h2>
 
-<!--                &lt;!&ndash; 이메일 입력 &ndash;&gt;-->
-<!--                <div class="mb-4">-->
-<!--                    <label for="email" class="block text-gray-700 font-bold mb-2">이메일</label>-->
-<!--                    <input type="email" id="email" placeholder="이메일 입력" required-->
-<!--                           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">-->
-<!--                </div>-->
-
                 <!-- 인증번호 전송 버튼 -->
                 <div class="mb-4">
-                    <button type="button" th:attr="onclick='sendVerificationEmail(event)'"
+                    <button type="button" onclick="sendVerificationEmail(event)"
                             class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-700 transition">
                         인증번호 전송
                     </button>
@@ -84,23 +90,34 @@
             </div>
 
             <!-- 아이디 입력 -->
-            <div class="relative">
+            <div class="flex space-x-2">
+                <div class="relative flex-1">
                     <span class="absolute left-3 top-3 text-gray-400">
                         <i class="far fa-user"></i>
                     </span>
-                <input type="text"
-                       name="loginId"
-                       id="loginId"
-                       required
-                       class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                       placeholder="아이디">
+                    <input type="text"
+                           name="loginId"
+                           id="loginId"
+                           required
+                           class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                           placeholder="아이디">
+                </div>
+                <button type="button"
+                        onclick="checkDuplicateId()"
+                        class="px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                    중복확인
+                </button>
+            </div>
+            <!-- 아이디 중복 체크 결과 메시지 -->
+            <div id="idCheckMessage" class="hidden mt-2">
+                <div class="px-4 py-3 rounded-lg"></div>
             </div>
 
             <!-- 이름 입력 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="far fa-user"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="far fa-user"></i>
+                </span>
                 <input type="text"
                        name="name"
                        id="name"
@@ -111,9 +128,9 @@
 
             <!-- 비밀번호 입력 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="fas fa-lock"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="fas fa-lock"></i>
+                </span>
                 <input type="password"
                        name="password"
                        id="password"
@@ -125,9 +142,9 @@
 
             <!-- 비밀번호 확인 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="fas fa-lock"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="fas fa-lock"></i>
+                </span>
                 <input type="password"
                        name="passwordConfirm"
                        id="passwordConfirm"
@@ -139,9 +156,9 @@
 
             <!-- 학년 선택 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="fas fa-graduation-cap"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="fas fa-graduation-cap"></i>
+                </span>
                 <select name="grade"
                         id="grade"
                         required
@@ -156,9 +173,9 @@
 
             <!-- 성별 선택 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="fas fa-venus-mars"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="fas fa-venus-mars"></i>
+                </span>
                 <select name="sex"
                         id="sex"
                         required
@@ -196,8 +213,8 @@
     </div>
 </div>
 
-<!-- Password validation script -->
 <script>
+    // Email verification functions
     function sendVerificationEmail(event) {
         event.preventDefault();
 
@@ -220,9 +237,9 @@
             },
             body: new URLSearchParams({ email })
         })
-            .then(response => response.json())  // JSON 응답 파싱
+            .then(response => response.json())
             .then(data => {
-                alert(data.message);  // 응답 메시지 표시
+                alert(data.message);
                 document.getElementById("verificationCode").disabled = false;
             })
             .catch(error => {
@@ -252,13 +269,62 @@
             },
             body: new URLSearchParams({ email, code })
         })
-            .then(response => response.json())  // JSON 응답 파싱
+            .then(response => response.json())
             .then(data => {
-                alert(data.message);  // 응답 메시지 표시
+                if (data.message === "인증 성공") {
+                    document.getElementById("emailVerified").value = "true";
+                    document.getElementById("emailForVerification").readOnly = true;
+                    document.getElementById("verificationStatus").innerHTML =
+                        '<div class="bg-green-50 text-green-600 px-4 py-3 rounded-lg">이메일 인증이 완료되었습니다.</div>';
+                    document.getElementById("verificationStatus").classList.remove("hidden");
+                } else {
+                    document.getElementById("emailVerified").value = "false";
+                }
+                alert(data.message);
             })
             .catch(error => {
                 console.error("Error:", error);
                 alert("인증번호 확인 중 오류가 발생했습니다.");
+            });
+    }
+
+    function checkDuplicateId() {
+        const loginId = document.getElementById('loginId').value;
+        const messageDiv = document.getElementById('idCheckMessage');
+        const messageContent = messageDiv.querySelector('div');
+
+        if (!loginId) {
+            alert("아이디를 입력해주세요.");
+            return;
+        }
+
+        fetch("/checkId", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json"
+            },
+            body: new URLSearchParams({ loginId })
+        })
+            .then(async response => {
+                const data = await response.json();
+                messageDiv.classList.remove('hidden');
+
+                if (response.ok) {
+                    messageContent.className = "px-4 py-3 rounded-lg bg-green-50 text-green-600";
+                    document.getElementById('idChecked').value = "true";
+                    document.getElementById('loginId').readOnly = true;
+                } else {
+                    messageContent.className = "px-4 py-3 rounded-lg bg-red-50 text-red-600";
+                    document.getElementById('idChecked').value = "false";
+                }
+                messageContent.textContent = data.message;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                messageDiv.classList.remove('hidden');
+                messageContent.className = "px-4 py-3 rounded-lg bg-red-50 text-red-600";
+                messageContent.textContent = "중복 확인 중 오류가 발생했습니다.";
             });
     }
 
@@ -286,17 +352,37 @@
             return false;
         }
 
-        const password = document.getElementById('password').value;
-        const passwordConfirm = document.getElementById('passwordConfirm').value;
+        const emailVerified = document.getElementById("emailVerified").value === "true";
+        const idChecked = document.getElementById("idChecked").value === "true";
 
-        if (password !== passwordConfirm) {
-            const mismatchDiv = document.getElementById('passwordMismatch');
-            mismatchDiv.classList.remove('hidden');
+        if (!emailVerified) {
+            document.getElementById("verificationStatus").classList.remove("hidden");
+            alert("이메일 인증이 필요합니다.");
+            return false;
+        }
+
+        if (!idChecked) {
+            alert("아이디 중복 확인이 필요합니다.");
             return false;
         }
 
         return true;
     }
+
+    // Reset ID check when input changes
+    document.getElementById('loginId').addEventListener('input', function() {
+        document.getElementById('idChecked').value = "false";
+        document.getElementById('idCheckMessage').classList.add('hidden');
+        this.readOnly = false;
+    });
+
+    // Reset email verification when input changes
+    document.getElementById('emailForVerification').addEventListener('input', function() {
+        document.getElementById('emailVerified').value = "false";
+        document.getElementById('verificationStatus').classList.add('hidden');
+        this.readOnly = false;
+    });
+
 </script>
 </body>
 </html>

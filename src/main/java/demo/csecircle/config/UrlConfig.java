@@ -19,7 +19,8 @@ public class UrlConfig implements WebMvcConfigurer {
                         "/verify",           // 이메일 인증 엔드포인트 추가
                         "/css/**",          // 정적 리소스 경로
                         "/js/**",
-                        "/images/**");
+                        "/images/**",
+                        "/checkId");
 
     }
 
