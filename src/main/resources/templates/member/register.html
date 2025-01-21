@@ -307,18 +307,23 @@
             body: new URLSearchParams({ loginId })
         })
             .then(async response => {
-                const data = await response.json();
-                messageDiv.classList.remove('hidden');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const data = await response.json();
+                    messageDiv.classList.remove('hidden');
 
-                if (response.ok) {
-                    messageContent.className = "px-4 py-3 rounded-lg bg-green-50 text-green-600";
-                    document.getElementById('idChecked').value = "true";
-                    document.getElementById('loginId').readOnly = true;
+                    if (response.ok) {
+                        messageContent.className = "px-4 py-3 rounded-lg bg-green-50 text-green-600";
+                        document.getElementById('idChecked').value = "true";
+                        // 이 줄 삭제: document.getElementById('loginId').readOnly = true;
+                    } else {
+                        messageContent.className = "px-4 py-3 rounded-lg bg-red-50 text-red-600";
+                        document.getElementById('idChecked').value = "false";
+                    }
+                    messageContent.textContent = data.message;
                 } else {
-                    messageContent.className = "px-4 py-3 rounded-lg bg-red-50 text-red-600";
-                    document.getElementById('idChecked').value = "false";
+                    throw new Error("서버가 JSON 응답이 아닌 데이터를 반환했습니다.");
                 }
-                messageContent.textContent = data.message;
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -327,6 +332,13 @@
                 messageContent.textContent = "중복 확인 중 오류가 발생했습니다.";
             });
     }
+
+    // 이벤트 리스너 수정: readOnly 초기화 제거
+    document.getElementById('loginId').addEventListener('input', function() {
+        document.getElementById('idChecked').value = "false";
+        document.getElementById('idCheckMessage').classList.add('hidden');
+        // 이 줄 삭제: this.readOnly = false;
+    });
 
     function validatePasswords() {
         const password = document.getElementById('password').value;
