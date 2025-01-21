@@ -9,39 +9,32 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 @SpringBootApplication
 public class CseCircleApplication {
 
-    private final MemberRepository memberRepository;
-    private final ClanRepository clanRepository;
+    private final JavaMailSender mailSender;
 
-    public CseCircleApplication(MemberRepository memberRepository, ClanRepository clanRepository) {
-        this.memberRepository = memberRepository;
-        this.clanRepository = clanRepository;
+    public CseCircleApplication(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
     }
 
     public static void main(String[] args) {
         SpringApplication.run(CseCircleApplication.class, args);
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void insertData() {
-
-
-//        // 동아리 생성
-//        Clan clan = new Clan();
-//        clan.setClanName("CSE");
-//        clan.setLeaderName("김준영");
-//        clan.setDescription("cse 입니다");
-//        clan.setClanLocation("공학1관");
-//        clan.setMeetingTime("화요일");
-//        clan.setTelNum("010-5217-4898");
-//        clanRepository.save(clan);
+//    @EventListener(ApplicationReadyEvent.class)
+//    public void insertData() {
 //
-//          // 멤버 업데이트 (클랜 정보 포함)
-
-        System.out.println("초기 데이터가 성공적으로 삽입되었습니다.");
-    }
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setFrom("557987@jj.ac.kr");
+//        message.setTo("557987@naver.com");
+//        message.setSubject("Test Subject");
+//        message.setText("Test Message");
+//
+//        mailSender.send(message);
+//    }
 
 }

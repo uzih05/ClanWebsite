@@ -193,20 +193,19 @@
               method="post" enctype="multipart/form-data">
 
             <!-- 아이콘 및 문서 업로드 -->
+            <!-- 아이콘 및 문서 업로드 -->
             <div class="upload-section">
                 <!-- 이미지 업로드 -->
                 <label for="image-upload" class="upload-box">
                     <img class="logo-image" th:src="@{/images/jpg.png}" alt="이미지 없음">
-
                 </label>
-                <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="updateLabel('image')">
+                <input type="file" id="image-upload" name="image" accept="image/*" style="display: none;">
 
                 <!-- 문서 업로드 -->
                 <label for="document-upload" class="upload-box">
                     <img class="logo-image" th:src="@{/images/document.jpg}" alt="이미지 없음">
-
                 </label>
-                <input type="file" id="document-upload" accept=".docx" style="display: none;" onchange="updateLabel('document')">
+                <input type="file" id="document-upload" name="document" accept=".docx" style="display: none;">
             </div>
 
             <!-- 동아리 이름 -->
@@ -217,8 +216,8 @@
 
             <!-- 동아리 회장님 이름 -->
             <div class="form-group">
-                <label class="form-label">동아리 회장님 이름 *</label>
-                <input type="text" class="form-input" th:field="*{leaderName}" placeholder="Enter leader name">
+                <label class="form-label">동아리장 이름 *</label>
+                <input type="text" class="form-input" th:field="${member.name}" placeholder="Enter leader name" readonly>
             </div>
 
             <!-- 연락처 -->
@@ -233,11 +232,6 @@
                 <input type="text" class="form-input" th:field="*{clanLocation}" placeholder="Enter location">
             </div>
 
-            <!-- 모임 시간 -->
-            <div class="form-group">
-                <label class="form-label">모임 시간 *(없으면 X)</label>
-                <input type="text" class="form-input" th:field="*{meetingTime}" placeholder="e.g., Every Monday 5:00 PM">
-            </div>
 
             <!-- 동아리 설명 -->
             <div class="form-group">

@@ -33,6 +33,11 @@ public class ClanService {
     public void saveClan(Clan clan){
         clanRepository.save(clan);
     }
+    public void saveClanLeader(Clan clan, Member member){
+        clanRepository.save(clan);
+        member.setClan(clan);
+        memberRepository.save(member);
+    }
 
     public Clan findClanById(Long id){
         return clanRepository.findById(id).orElse(null);
@@ -43,8 +48,8 @@ public class ClanService {
             return;
         }
         clan.getSignupMembers().add(member);
-        clanRepository.save(clan);
         member.setSignupClan(clan);
+        clanRepository.save(clan);
         memberRepository.save(member);
     }
 

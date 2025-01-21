@@ -365,6 +365,17 @@
             </div>
         </div>
 
+        <div class="recruit-bar recruit-no" th:if="${member != null
+
+
+                                              and clan.isRecruit.toString().equals('YES')
+                                              and member.clan != null}">
+            <div class="recruit-status">
+                <div class="icon-no"></div>
+                <div class="text-no">가입된 동아리가 있습니다.</div>
+            </div>
+        </div>
+
         <!-- (4-1) 모집 상태: NO -->
         <div class="recruit-bar recruit-no" th:if="${clan.isRecruit.toString().equals('NO')}">
             <div class="recruit-status">

@@ -44,10 +44,43 @@
                     </span>
                 <input type="email"
                        name="email"
-                       id="email"
+                       id="emailForVerification"
                        required
                        class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                        placeholder="이메일">
+            </div>
+            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 w-full max-w-md">
+                <h2 class="text-xl font-semibold text-center mb-4">이메일 인증</h2>
+
+<!--                &lt;!&ndash; 이메일 입력 &ndash;&gt;-->
+<!--                <div class="mb-4">-->
+<!--                    <label for="email" class="block text-gray-700 font-bold mb-2">이메일</label>-->
+<!--                    <input type="email" id="email" placeholder="이메일 입력" required-->
+<!--                           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">-->
+<!--                </div>-->
+
+                <!-- 인증번호 전송 버튼 -->
+                <div class="mb-4">
+                    <button type="button" th:attr="onclick='sendVerificationEmail(event)'"
+                            class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-700 transition">
+                        인증번호 전송
+                    </button>
+                </div>
+
+                <!-- 인증번호 입력 -->
+                <div class="mb-4">
+                    <label for="verificationCode" class="block text-gray-700 font-bold mb-2">인증번호</label>
+                    <input type="text" id="verificationCode" placeholder="인증번호 입력"
+                           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- 인증번호 확인 버튼 -->
+                <div class="mb-4">
+                    <button type="button" onclick="verifyCode()"
+                            class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition">
+                        인증번호 확인
+                    </button>
+                </div>
             </div>
 
             <!-- 아이디 입력 -->
@@ -165,6 +198,70 @@
 
 <!-- Password validation script -->
 <script>
+    function sendVerificationEmail(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("emailForVerification").value;
+        if (!email) {
+            alert("이메일을 입력해주세요.");
+            return;
+        }
+
+        const button = event.target;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "전송중...";
+
+        fetch("/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json"
+            },
+            body: new URLSearchParams({ email })
+        })
+            .then(response => response.json())  // JSON 응답 파싱
+            .then(data => {
+                alert(data.message);  // 응답 메시지 표시
+                document.getElementById("verificationCode").disabled = false;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("인증번호 전송 중 오류가 발생했습니다.");
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.textContent = originalText;
+            });
+    }
+
+    function verifyCode() {
+        const email = document.getElementById("emailForVerification").value;
+        const code = document.getElementById("verificationCode").value;
+
+        if (!email || !code) {
+            alert("이메일과 인증번호를 입력해주세요.");
+            return;
+        }
+
+        fetch("/verify", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json"
+            },
+            body: new URLSearchParams({ email, code })
+        })
+            .then(response => response.json())  // JSON 응답 파싱
+            .then(data => {
+                alert(data.message);  // 응답 메시지 표시
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("인증번호 확인 중 오류가 발생했습니다.");
+            });
+    }
+
     function validatePasswords() {
         const password = document.getElementById('password').value;
         const passwordConfirm = document.getElementById('passwordConfirm').value;

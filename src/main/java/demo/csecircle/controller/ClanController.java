@@ -8,6 +8,7 @@ import demo.csecircle.controller.form.ClanSearchForm;
 import demo.csecircle.domain.Clan;
 import demo.csecircle.domain.Member;
 import demo.csecircle.service.ClanService;
+import demo.csecircle.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -31,6 +32,7 @@ import java.util.List;
 public class ClanController {
 
     private final ClanService clanService;
+    private final MemberService memberService;
 
     @GetMapping("/clans")
     public String clans(Model model, @RequestParam(defaultValue = "") String clanName){
@@ -43,15 +45,16 @@ public class ClanController {
 
     @GetMapping("/clans/{clanId}")
     public String clan(@PathVariable Long clanId, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member){
-        boolean isPresident = member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT);
-        boolean isAdmin = member.getMemberRole().equals(MemberRole.WEBSITE_ADMIN);
+        Member memberById = memberService.findMemberById(member.getId());
+        boolean isPresident = memberById.getMemberRole().equals(MemberRole.CLUB_PRESIDENT);
+        boolean isAdmin = memberById.getMemberRole().equals(MemberRole.WEBSITE_ADMIN);
         if(isPresident || isAdmin){
             model.addAttribute("isAdmin", true);
         }
         Clan clan = clanService.findClanById(clanId);
 
-        if(clan.getIsRecruit().equals(ClanRecruit.YES) && member.getSignupClan() == null
-                && !clan.getSignupMembers().contains(member)){
+        if(clan.getIsRecruit().equals(ClanRecruit.YES) && memberById.getSignupClan() == null
+                && !clan.getSignupMembers().contains(memberById) && memberById.getClan() == null){
             model.addAttribute("isRecruit", true);
         }
         if (clan.getImage() != null) {
@@ -63,23 +66,27 @@ public class ClanController {
             model.addAttribute("base64Document", base64Document);
         }
         model.addAttribute("clan", clan);
-        model.addAttribute("member", member);
+        model.addAttribute("member", memberById);
         return "clan/clan";
     }
 
     @GetMapping("/clans/clanSave")
-    public String clanSave(@ModelAttribute ClanForm clanForm, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member){
-        model.addAttribute("member",member);
+    public String clanSave(@ModelAttribute ClanForm clanForm, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member) {
+        Member memberById = memberService.findMemberById(member.getId());
+        if(!memberById.getMemberRole().equals(MemberRole.CLUB_PRESIDENT)){
+            return "redirect:/";
+        }
+        model.addAttribute("member", memberById);
         model.addAttribute("clanForm", clanForm);
         return "clan/clanSave";
     }
 
     @PostMapping("/clans/clanSave")
     public String clanSave(@ModelAttribute ClanForm clanForm, @RequestParam("image") MultipartFile image,
-                           @RequestParam("document") MultipartFile document) throws IOException {
+                           @RequestParam("document") MultipartFile document,@SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member) throws IOException {
         Clan clan = new Clan();
         clan.setClanName(clanForm.getClanName());
-        clan.setLeaderName(clanForm.getLeaderName());
+        clan.setLeaderName(member.getName());
         clan.setClanLocation(clanForm.getClanLocation());
         clan.setTelNum(clanForm.getTelNum());
         clan.setMeetingTime(clanForm.getMeetingTime());
@@ -96,7 +103,7 @@ public class ClanController {
             byte[] documentBytes = document.getBytes();
             clan.setDocument(documentBytes);
         }
-        clanService.saveClan(clan);
+        clanService.saveClanLeader(clan,member);
         return "redirect:/clans";
     }
 
@@ -189,7 +196,8 @@ public class ClanController {
     @GetMapping("/clans/{clanId}/manage")
     public String manage(@PathVariable Long clanId, Model model,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member){
         Clan clan = clanService.findClanById(clanId);
-        model.addAttribute("member", member);
+        Member memberById = memberService.findMemberById(member.getId());
+        model.addAttribute("member", memberById);
 
         if (clan.getImage() != null) {
             String base64Image = Base64.getEncoder().encodeToString(clan.getImage());
@@ -222,10 +230,6 @@ public class ClanController {
         return "redirect:/clans/{clanId}/manage";
     }
 
-    @PostMapping("/clans/{clanId}/addWaitingMember")
-    public String addMember(@PathVariable Long clanId, @ModelAttribute Member member){
-        return "redirect:/clans/{clanId}/manage";
-    }
 
     @PostMapping("/clans/{clanId}/signupMember/{applicantId}/approve")
     @ResponseBody

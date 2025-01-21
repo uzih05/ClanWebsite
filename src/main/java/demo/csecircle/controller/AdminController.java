@@ -29,13 +29,13 @@ public class AdminController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) MemberRole role,
             @PageableDefault(size = 10) Pageable pageable,
-            @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member currentMember,
+            @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member memberNow,
             Model model) {
+        Member currentMember = memberService.findMemberById(memberNow.getId());
 
-
-//        if (currentMember == null || currentMember.getMemberRole() != MemberRole.WEBSITE_ADMIN) {
-//            return "redirect:/";
-//        }
+        if (currentMember == null || currentMember.getMemberRole() != MemberRole.WEBSITE_ADMIN) {
+            return "redirect:/";
+        }
 
 
 

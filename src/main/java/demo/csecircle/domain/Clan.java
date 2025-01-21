@@ -47,4 +47,6 @@ public class Clan {
     // 문서 파일을 저장할 필드
     @Lob
     private byte[] document;
+
+
 }

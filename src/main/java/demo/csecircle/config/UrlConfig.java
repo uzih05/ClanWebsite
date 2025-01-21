@@ -13,7 +13,13 @@ public class UrlConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UrlFilter())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/member/login","/member/register");
+                .excludePathPatterns("/member/login",
+                        "/member/register",
+                        "/send",             // 이메일 인증 엔드포인트 추가
+                        "/verify",           // 이메일 인증 엔드포인트 추가
+                        "/css/**",          // 정적 리소스 경로
+                        "/js/**",
+                        "/images/**");
 
     }
 

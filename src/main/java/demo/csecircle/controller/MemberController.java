@@ -5,6 +5,7 @@ import demo.csecircle.domain.Clan;
 import demo.csecircle.domain.Member;
 import demo.csecircle.service.ClanService;
 import demo.csecircle.service.LoginService;
+import demo.csecircle.service.MailService;
 import demo.csecircle.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class MemberController {
     private final LoginService loginService;
     private final ClanService clanService;
     private final MemberService memberService;
+    private final MailService mailService;
 
 
     @GetMapping("member/register")
@@ -37,6 +41,38 @@ public class MemberController {
         model.addAttribute("newMember", new Member());
         return "member/register";
     }
+
+
+    @PostMapping("/send")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> sendVerificationEmail(@RequestParam String email) {
+        try {
+            mailService.sendVerificationEmail(email);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "인증번호가 이메일로 전송되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "이메일 전송 실패");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PostMapping("/verify")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> verifyCode(@RequestParam String email, @RequestParam String code) {
+        Map<String, String> response = new HashMap<>();
+        boolean isValid = mailService.verifyCode(email, code);
+        if (isValid) {
+            mailService.removeCode(email);
+            response.put("message", "인증 성공");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("message", "인증 실패");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
 
     @PostMapping("member/register")
     public String register(@ModelAttribute Member member, @RequestParam("image") MultipartFile image) throws IOException {
@@ -65,9 +101,10 @@ public class MemberController {
 
     @GetMapping("/member/mypage")
     public String memberPage(Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER,required = false) Member member) {
-        List<Clan> clans = clanService.getMemberClanList(member);
+        Member memberById = memberService.findMemberById(member.getId());
+        List<Clan> clans = clanService.getMemberClanList(memberById);
         model.addAttribute("clanList",clans);
-        model.addAttribute("member",member);
+        model.addAttribute("member",memberById);
         return "member/myPage";
     }
 
