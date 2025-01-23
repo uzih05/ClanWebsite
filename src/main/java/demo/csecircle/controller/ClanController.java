@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,10 +49,10 @@ public class ClanController {
         Member memberById = memberService.findMemberById(member.getId());
         boolean isPresident = memberById.getMemberRole().equals(MemberRole.CLUB_PRESIDENT);
         boolean isAdmin = memberById.getMemberRole().equals(MemberRole.WEBSITE_ADMIN);
-        if(isPresident || isAdmin){
+        Clan clan = clanService.findClanById(clanId);
+        if(isPresident || isAdmin && clan.getLeaderName().equals(memberById.getName())){
             model.addAttribute("isAdmin", true);
         }
-        Clan clan = clanService.findClanById(clanId);
 
         if(clan.getIsRecruit().equals(ClanRecruit.YES) && memberById.getSignupClan() == null
                 && !clan.getSignupMembers().contains(memberById) && memberById.getClan() == null){
@@ -71,9 +72,11 @@ public class ClanController {
     }
 
     @GetMapping("/clans/clanSave")
-    public String clanSave(@ModelAttribute ClanForm clanForm, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member) {
+    public String clanSave(@ModelAttribute ClanForm clanForm, Model model, @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member,
+                           BindingResult bindingResult) {
         Member memberById = memberService.findMemberById(member.getId());
         if(!memberById.getMemberRole().equals(MemberRole.CLUB_PRESIDENT)){
+            bindingResult.reject("동아리장이 아닙니다.");
             return "redirect:/";
         }
         model.addAttribute("member", memberById);
@@ -144,7 +147,7 @@ public class ClanController {
     @GetMapping("/clans/{clanId}/edit")
     public String edit(@PathVariable Long clanId, Model model,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member){
         Clan clan = clanService.findClanById(clanId);
-        boolean isAdmin = member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT);
+        boolean isAdmin = member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT) && clan.getLeaderName().equals(member.getName());
         model.addAttribute("member", member);
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("clanForm", makeEditClanForm(clan));
@@ -167,9 +170,12 @@ public class ClanController {
     @PostMapping("/clans/{clanId}/edit")
     public String editPost(@PathVariable Long clanId, @ModelAttribute ClanForm clanForm, @RequestParam("image") MultipartFile image,
                            @RequestParam("document") MultipartFile document,
-                           Model model) throws IOException {
+                           Model model, BindingResult bindingResult,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member) throws IOException {
 
         Clan clan = clanService.findClanById(clanId);
+        if(!clan.getLeaderName().equals(member.getName())){
+            bindingResult.reject("동아리장이 아닙니다");
+        }
         clan.setClanName(clanForm.getClanName());
         clan.setLeaderName(clanForm.getLeaderName());
         clan.setClanLocation(clanForm.getClanLocation());
@@ -215,9 +221,13 @@ public class ClanController {
     }
 
     @PostMapping("/clans/{clanId}/recruitChange")
-    public String changeRecruit(@PathVariable Long clanId,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member){
+    public String changeRecruit(@PathVariable Long clanId,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member
+    ,BindingResult bindingResult){
         if(member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT) || member.getMemberRole().equals(MemberRole.WEBSITE_ADMIN)){
             Clan clan = clanService.findClanById(clanId);
+            if(!clan.getLeaderName().equals(member.getName())){
+                bindingResult.reject("동아리장이 아닙니다");
+            }
             if(clan.getIsRecruit().equals(ClanRecruit.YES)){
                 clan.setIsRecruit(ClanRecruit.NO);
             }
@@ -233,9 +243,12 @@ public class ClanController {
 
     @PostMapping("/clans/{clanId}/signupMember/{applicantId}/approve")
     @ResponseBody
-    public ResponseEntity<String> approveApplicant(@PathVariable Long clanId, @PathVariable Long applicantId) {
+    public ResponseEntity<String> approveApplicant(@PathVariable Long clanId, @PathVariable Long applicantId, @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member loginMember
+    ,BindingResult bindingResult) {
         Clan clan = clanService.findClanById(clanId);  // 클럽 정보 조회
-
+        if(!clan.getLeaderName().equals(loginMember.getName())){
+            bindingResult.reject("동아리장이 아닙니다");
+        }
         if (clan == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Clan not found");
         }
@@ -258,9 +271,12 @@ public class ClanController {
 
     @PostMapping("/clans/{clanId}/signupMember/{applicantId}/reject")
     @ResponseBody
-    public ResponseEntity<String> rejectApplicant(@PathVariable Long clanId, @PathVariable Long applicantId) {
+    public ResponseEntity<String> rejectApplicant(@PathVariable Long clanId, @PathVariable Long applicantId,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member loginMember,
+                                                  BindingResult bindingResult) {
         Clan clan = clanService.findClanById(clanId);  // 클럽 정보 조회
-
+        if(!clan.getLeaderName().equals(loginMember.getName())){
+            bindingResult.reject("동아리장이 아닙니다");
+        }
         if (clan == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Clan not found");
         }

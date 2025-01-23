@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -167,12 +168,16 @@ public class MemberController {
 //    }
 
     @DeleteMapping("/clans/{clanId}/members/{memberId}")
-    public ResponseEntity<?> deleteMember(@PathVariable Long clanId, @PathVariable Long memberId) {
+    public ResponseEntity<?> deleteMember(@PathVariable Long clanId, @PathVariable Long memberId, @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member loginMember,
+                                          BindingResult bindingResult) {
         log.info("Delete request received for memberId: {} from clanId: {}", memberId, clanId);
-
         try {
             // Find the clan by ID
             Clan clan = clanService.findClanById(clanId);
+            if(!clan.getLeaderName().equals(loginMember.getName())){
+                bindingResult.reject("동아리장이 아닙니다");
+            }
+
             if (clan == null) {
                 return ResponseEntity.status(404).body("Clan not found");
             }
@@ -184,7 +189,11 @@ public class MemberController {
             }
 
             // Delete the member from the clan
-            clanService.deleteMember(clan, memberById);
+            if(clan.getLeaderName().equals(memberService.findMemberById(memberId).getName())) {
+                bindingResult.reject("동아리장은 삭제할수없습니다.");
+            }else{
+                clanService.deleteMember(clan, memberById);
+            }
 
             return ResponseEntity.ok("Member deleted successfully");
         } catch (Exception e) {
