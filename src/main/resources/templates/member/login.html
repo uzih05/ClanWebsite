@@ -13,8 +13,8 @@
         <!-- 헤더 -->
         <h2 class="text-xl font-semibold text-center mb-8">로그인</h2>
 
-        <!-- 에러 메시지 -->
-        <div th:if="${param.error}" class="mb-4">
+        <!-- 에러 메시지 - Thymeleaf와 JavaScript 모두 처리 -->
+        <div th:if="${param.error}" class="mb-4" id="loginError">
             <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
                 아이디 또는 비밀번호가 일치하지 않습니다.
             </div>
@@ -28,35 +28,39 @@
         </div>
 
         <!-- 로그인 폼 -->
-        <form th:action="@{/member/login}" method="post" class="space-y-4">
+        <form th:action="@{/member/login}" method="post" class="space-y-4" id="loginForm" onsubmit="return validateForm()">
             <!-- 리다이렉트 URL -->
             <input type="hidden" name="redirectURL" th:value="${param.redirectURL}">
 
             <!-- 사용자명 입력 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="far fa-user"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="far fa-user"></i>
+                </span>
                 <input type="text"
                        name="loginId"
+                       id="loginId"
+                       required
                        class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                        placeholder="아이디">
             </div>
 
             <!-- 비밀번호 입력 -->
             <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-400">
-                        <i class="fas fa-lock"></i>
-                    </span>
+                <span class="absolute left-3 top-3 text-gray-400">
+                    <i class="fas fa-lock"></i>
+                </span>
                 <input type="password"
                        name="password"
+                       id="password"
+                       required
                        class="w-full px-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                        placeholder="비밀번호">
             </div>
 
             <!-- 로그인 상태 유지 -->
             <div class="flex items-center">
-                <input type="checkbox" id="remember" class="w-4 h-4 border-gray-300 rounded">
+                <input type="checkbox" id="remember" name="remember-me" class="w-4 h-4 border-gray-300 rounded">
                 <label for="remember" class="ml-2 text-sm text-gray-600">로그인 상태 유지</label>
             </div>
 
@@ -77,5 +81,56 @@
         </div>
     </div>
 </div>
+
+<script>
+    // 폼 유효성 검사
+    function validateForm() {
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+
+        // Remove existing error message if present
+        const existingError = document.getElementById('loginError');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // 기본적인 유효성 검사
+        if (!loginId || !password) {
+            const newErrorDiv = document.createElement('div');
+            newErrorDiv.id = 'loginError';
+            newErrorDiv.className = 'mb-4';
+            newErrorDiv.innerHTML = `
+            <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
+                아이디와 비밀번호를 모두 입력해주세요.
+            </div>
+        `;
+            const header = document.querySelector('h2');
+            header.parentNode.insertBefore(newErrorDiv, header.nextSibling);
+            return false;
+        }
+
+        return true;
+    }
+
+    // URL 파라미터에서 에러 확인
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const existingError = document.getElementById('loginError');
+
+        if (urlParams.has('error') && !existingError) {
+            const newErrorDiv = document.createElement('div');
+            newErrorDiv.id = 'loginError';
+            newErrorDiv.className = 'mb-4';
+            newErrorDiv.innerHTML = `
+            <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
+                아이디 또는 비밀번호가 일치하지 않습니다.
+            </div>
+        `;
+            const header = document.querySelector('h2');
+            header.parentNode.insertBefore(newErrorDiv, header.nextSibling);
+        }
+    }
+</script>
+
 </body>
 </html>

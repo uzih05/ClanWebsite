@@ -2,176 +2,51 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Club Explorer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-        body {
-            background: white;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .main-container {
-            width: 402px;
-            height: 874px;
-            background: #F9FAFB;
-            position: relative;
-        }
-        .search-container {
-            position: relative;
-            width: 378px;
-            height: 62px;
-            background: white;
-            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input {
-            flex: 1;
-            height: 38px;
-            padding: 9px 13px 9px 37px;
-            background: white;
-            border: 1px solid #D1D5DB;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #9CA3AF;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 24px;
-            color: #9CA3AF;
-        }
-        .club-section {
-            margin: 20px 12px;
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: black;
-        }
-        .sort-button {
-            padding: 5px 13px;
-            background: #EFEFEF;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .club-card {
-            background: white;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-        }
-        .club-image {
-            width: 56px;
-            height: 56px;
-            background: #E5E7EB;
-            border-radius: 8px;
-            margin-right: 12px;
-        }
-        .club-info {
-            flex: 1;
-        }
-        .club-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: black;
-            margin-bottom: 4px;
-        }
-        .club-category {
-            font-size: 12px;
-            color: #4B5563;
-            margin-bottom: 8px;
-        }
-        .club-stats {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
-            color: #6B7280;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 402px;
-            height: 69px;
-            background: white;
-            border-top: 1px solid #E5E7EB;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 0;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: #6B7280;
-        }
-        .nav-item.active {
-            color: #3B82F6;
-        }
-    </style>
 </head>
-<body>
-<div class="main-container">
+<body class="bg-white min-h-screen">
+<div class="w-full max-w-lg mx-auto min-h-screen bg-gray-50 relative pb-20">
     <!-- 검색창 -->
-    <form th:action="@{/clans}" method="get" class="w-full">
-        <div style="width: 378px; height: 62px; position: relative; background: white; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05); border-radius: 8px" class="BackgroundShadow">
-            <div style="height: 38px; padding-top: 9px; padding-bottom: 10px; padding-left: 37px; padding-right: 13px; left: 12px; top: 12px; position: absolute; background: white; border-radius: 8px; overflow: hidden; border: 1px #D1D5DB solid; justify-content: flex-end; align-items: center; display: inline-flex" class="Input">
+    <form th:action="@{/clans}" method="get" class="p-3">
+        <div class="w-full bg-white rounded-lg shadow-sm p-3">
+            <div class="relative">
                 <input type="text"
                        name="clanName"
                        th:value="${param.clanName}"
-                       style="width: 304px; border: none; outline: none; color: #9CA3AF; font-size: 14px; font-family: Inter;"
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                        placeholder="동아리 검색...">
+                <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <i class="fas fa-search text-gray-400"></i>
+                </button>
             </div>
-            <button type="submit" style="width: 16px; height: 16px; padding: 2px; left: 22px; top: 22px; position: absolute; justify-content: center; align-items: center; display: inline-flex">
-                <div style="width: 12px; height: 12px; border: 1.33px #9CA3AF solid"></div>
-            </button>
         </div>
     </form>
 
     <!-- 동아리 리스트 섹션 -->
-    <div class="club-section">
-        <div class="section-header">
-            <h2 class="section-title">전체 동아리</h2>
-            <button class="sort-button">최신순</button>
+    <div class="px-3 py-5">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-black">전체 동아리</h2>
+            <button class="px-3 py-1 bg-gray-100 border border-gray-200 rounded-lg text-sm">
+                최신순
+            </button>
         </div>
 
         <!-- 동아리 카드 리스트 -->
-        <div th:each="clan : ${clanList}" class="club-card">
-            <div class="club-info">
-                <a class="club-name"
-                   th:href="@{/clans/{clanId}(clanId=${clan.id})}"
-                   th:text="${clan.clanName}"
-                   style="text-decoration: none; color: black; font-size: 14px; font-weight: 700; margin-bottom: 4px; display: block;">
-                    동아리명
-                </a>
-                <div class="club-category">카테고리</div>
-                <div class="club-stats">
-                    <div>
-                        <i class="fas fa-user"></i>
+        <div class="space-y-3">
+            <div th:each="clan : ${clanList}"
+                 class="bg-white rounded-lg shadow-sm p-3 flex items-center">
+                <div class="flex-1">
+                    <a th:href="@{/clans/{clanId}(clanId=${clan.id})}"
+                       class="block font-bold text-black text-sm mb-1 hover:text-blue-600"
+                       th:text="${clan.clanName}">
+                        동아리명
+                    </a>
+                    <div class="text-xs text-gray-600 mb-2">카테고리</div>
+                    <div class="text-xs text-gray-500">
+                        <i class="fas fa-user mr-1"></i>
                         <span th:text="${clan.getMembers().size()} + '명'">35명</span>
                     </div>
                 </div>
@@ -180,16 +55,20 @@
     </div>
 
     <!-- 하단 네비게이션 -->
-    <div class="bottom-nav">
-        <a href="/clans" style="color: #3B82F6; text-decoration: none; text-align: center;">
-            <i class="fas fa-compass" style="display: block; margin-bottom: 4px;"></i>
-            <span style="font-size: 12px;">탐색</span>
-        </a>
-        <a href="/member/mypage" style="color: #6B7280; text-decoration: none; text-align: center;">
-            <i class="fas fa-user" style="display: block; margin-bottom: 4px;"></i>
-            <span style="font-size: 12px;">내정보</span>
-        </a>
-    </div>
+    <nav class="fixed bottom-0 w-full max-w-lg bg-white border-t border-gray-200">
+        <div class="flex justify-around py-3">
+            <a href="/clans"
+               class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-compass mb-1"></i>
+                <span class="text-xs">탐색</span>
+            </a>
+            <a href="/member/mypage"
+               class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-user mb-1"></i>
+                <span class="text-xs">내정보</span>
+            </a>
+        </div>
+    </nav>
 </div>
 </body>
 </html>

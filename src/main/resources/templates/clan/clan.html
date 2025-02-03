@@ -2,435 +2,152 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
-    <title>Detail (폰 화면용)</title>
-
-    <!-- Font Awesome (SRI 미검증 버전) -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-          referrerpolicy="no-referrer" />
-
-    <!-- ================================
-         1) 스타일(디자인) 정의
-    ================================== -->
-    <style>
-        /* 전체를 감싸는 컨테이너: 폰에서도 화면 중앙 정렬 */
-        .outer-wrapper {
-            width: 100%;
-            min-height: 100vh;
-            padding-top: 33px;
-            padding-bottom: 75px;
-            background: #F9FAFB;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            box-sizing: border-box;
-        }
-
-        /* 카드(내용) 컨테이너 */
-        .card-container {
-            width: 338px;           /* 최대 폭 고정 */
-            background: #FFFFFF;
-            box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.10);
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; /* 내부 배치는 flex-start로 */
-            position: relative;      /* 필수 정보 섹션 등에 absolute가 있기 때문 */
-        }
-
-        /* (1) 동아리 이름 영역 */
-        .club-name-area {
-            width: 100%;
-            padding-top: 16px;
-            padding-bottom: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .club-name-text {
-            color: #111827;
-            font-size: 24px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 32px;
-            word-wrap: break-word;
-        }
-
-        /* (2) 로고 영역 */
-        .logo-container {
-            width: 64px;
-            height: 64px;
-            border-radius: 8px;
-            margin: 0 auto; /* 가운데 정렬 */
-            position: relative;
-        }
-        .logo-image {
-            width: 64px;
-            height: 64px;
-            border-radius: 8px;
-            object-fit: cover;
-            position: absolute;
-        }
-
-        /* (3) 리더/설립년도 */
-        .leader-info {
-            margin: 8px auto 0;
-            color: #6B7280;
-            font-size: 14px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 20px;
-            word-wrap: break-word;
-        }
-
-        /* (4) 모집 상태 */
-        .recruit-bar {
-            width: 100%;
-            padding: 8px 10px;
-            border-top: 1px #E5E7EB solid;
-            display: flex;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        .recruit-status {
-            height: 24px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .icon-yes {
-            color: #16A34A;
-            font-size: 16px;
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            line-height: 16px;
-            word-wrap: break-word;
-        }
-        .text-yes {
-            color: #166534;
-            font-size: 16px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 24px;
-            word-wrap: break-word;
-        }
-        .icon-no {
-            color: #DC2626;
-            font-size: 16px;
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            line-height: 16px;
-            word-wrap: break-word;
-        }
-        .text-no {
-            color: #B91C1C;
-            font-size: 16px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 24px;
-            word-wrap: break-word;
-        }
-
-        /* (4-1) 모집중 바 */
-        .recruit-yes {
-            background: #F0FDF4;
-            justify-content: space-between; /* 문구와 버튼 사이 공간 확보 */
-        }
-        /* (4-2) 모집종료 바 */
-        .recruit-no {
-            background: #FEF2F2;
-            justify-content: flex-start;
-        }
-
-        /* (5) 가입하기 버튼 */.join-btn {
-                             height: 50px; /* 버튼 높이를 더 크게 */
-                             padding: 10px 20px; /* 버튼 내부 여백을 더 넓게 */
-                             background: #4CAF50; /* 배경 색상을 초록색으로 */
-                             border-radius: 6px; /* 모서리를 둥글게 */
-                             display: flex;
-                             justify-content: center;
-                             align-items: center;
-                             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* 그림자 추가 */
-                             transition: background-color 0.3s, transform 0.2s; /* 호버 시 색상 변경 및 크기 변화 */
-                         }
-
-        .join-btn-text {
-            color: white;
-            font-size: 18px; /* 글씨 크기 증가 */
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 600; /* 글씨 두껍게 */
-            text-align: center;
-            word-wrap: break-word;
-        }
-
-        /* (6) 소개 */
-        .introduce-title {
-            width: 100%;
-            margin-top: 16px;
-            margin-left: 16px;
-            color: #111827;
-            font-size: 18px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 28px;
-            word-wrap: break-word;
-        }
-        .introduce-text {
-            width: 100%;
-            max-width: 288.36px;
-            margin: 8px 16px;
-            color: #4B5563;
-            font-size: 15.88px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 24px;
-            word-wrap: break-word;
-        }
-
-        /* (7) 필수 정보 섹션 */
-        .essential-info {
-            width: 290px;
-            height: 264px;
-            position: relative;
-            background: #F9FAFB;
-            border-radius: 8px;
-            margin: 16px auto;
-        }
-        .essential-info-title {
-            width: 183.01px;
-            height: 28px;
-            left: 24px;
-            top: 24px;
-            position: absolute;
-            color: #111827;
-            font-size: 18px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 28px;
-            word-wrap: break-word;
-        }
-        .icon-meeting {
-            width: 16.39px;
-            height: 16px;
-            left: 24px;
-            top: 72px;
-            position: absolute;
-            color: black;
-            font-size: 16px;
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            line-height: 16px;
-            word-wrap: break-word;
-        }
-        .icon-location {
-            width: 12.34px;
-            height: 16px;
-            left: 24px;
-            top: 148px;
-            position: absolute;
-            color: black;
-            font-size: 16px;
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            line-height: 16px;
-            word-wrap: break-word;
-        }
-        .icon-contact {
-            width: 16.39px;
-            height: 16px;
-            left: 24px;
-            top: 204px;
-            position: absolute;
-            color: black;
-            font-size: 16px;
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            line-height: 16px;
-            word-wrap: break-word;
-        }
-        .info-meeting {
-            width: 210.81px;
-            height: 54px;
-            left: 54.03px;
-            top: 71px;
-            position: absolute;
-        }
-        .info-location {
-            width: 209px;
-            height: 34px;
-            left: 56px;
-            top: 147px;
-            position: absolute;
-        }
-        .info-contact {
-            width: 209px;
-            height: 34px;
-            left: 56px;
-            top: 203px;
-            position: absolute;
-        }
-        .info-title {
-            color: #111827;
-            font-size: 14px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 20px;
-            word-wrap: break-word;
-        }
-        .info-detail {
-            color: #4B5563;
-            font-size: 14px;
-            font-family: Segoe UI Symbol, sans-serif;
-            font-weight: 400;
-            line-height: 20px;
-            word-wrap: break-word;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Detail</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
-
-<body style="margin:0; padding:0; font-family: Segoe UI Symbol, sans-serif;">
-
-<!-- ================================
-     2) 기능(타임리프 + 구조) 정의
-================================== -->
-
-<!-- 화면 전체 감싸는 컨테이너 -->
-<div class="outer-wrapper" th:fragment="clan-page">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <!-- 관리자 역할일 경우에만 버튼 표시 -->
+<body class="bg-gray-50 min-h-screen pt-8 pb-20">
+<div class="w-full max-w-lg mx-auto px-4">
+    <!-- Admin Buttons -->
+    <div class="flex items-center gap-3 mb-4">
         <a th:if="${isAdmin}"
            th:href="@{/clans/{clanId}/edit(clanId=${clan.id})}"
-           style="padding: 8px 12px; background: #374151; color: white; border-radius: 4px; text-decoration:none; font-size:14px;">
-            <i class="fas fa-users mr-1"></i> 수정
+           class="px-3 py-2 bg-gray-700 text-white rounded text-sm inline-flex items-center hover:bg-gray-600">
+            <i class="fas fa-users mr-2"></i> 수정
         </a>
-    </div>
-    <div class="outer-wrapper" th:fragment="clan-page">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <!-- 관리자 역할일 경우에만 버튼 표시 -->
         <a th:if="${isAdmin}"
            th:href="@{/clans/{clanId}/manage(clanId=${clan.id})}"
-           style="padding: 8px 12px; background: #374151; color: white; border-radius: 4px; text-decoration:none; font-size:14px;">
-            <i class="fas fa-users mr-1"></i> 관리
+           class="px-3 py-2 bg-gray-700 text-white rounded text-sm inline-flex items-center hover:bg-gray-600">
+            <i class="fas fa-users mr-2"></i> 관리
         </a>
     </div>
 
-    <!-- 카드 컨테이너 -->
-    <div class="card-container">
+    <!-- Main Card -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <!-- Club Name -->
+        <div class="text-center py-4">
+            <h1 class="text-2xl text-gray-900" th:text="${clan.clanName}">동아리 이름</h1>
+        </div>
 
-        <!-- (1) 동아리 이름 영역 -->
-        <div class="club-name-area">
-            <div class="club-name-text" th:text="${clan.clanName}">
-                동아리 이름
+        <!-- Logo -->
+        <div class="flex justify-center">
+            <div class="w-16 h-16 rounded-lg overflow-hidden">
+                <img class="w-full h-full object-cover"
+                     th:src="'data:image/jpeg;base64,' + ${base64Image}"
+                     alt="Club Logo">
             </div>
         </div>
 
-        <!-- (2) 로고 영역 -->
-        <div class="logo-container">
-            <img class="logo-image" th:src="'data:image/jpeg;base64,' + ${base64Image}" alt="이미지 없음">
-        </div>
-
-        <!-- (3) 리더/설립년도 -->
-        <div class="leader-info" th:text="'Leader: ' + ${clan.leaderName}">
+        <!-- Leader Info -->
+        <div class="text-center text-gray-500 text-sm mt-2" th:text="'Leader: ' + ${clan.leaderName}">
             Est. 2015
         </div>
 
-        <!-- (4) 모집 상태: YES -->
-        <!-- (4) 모집 상태: YES -->
-        <!-- (4) 모집 상태: YES -->
-        <!-- 가입 버튼 -->
-        <div class="recruit-bar recruit-yes" th:if="${isRecruit}">
-            <div class="recruit-status">
-                <div class="icon-yes"></div>
-                <div class="text-yes">현재 모집중.</div>
+        <!-- Recruitment Status -->
+        <!-- 모집중 -->
+        <div th:if="${isRecruit}" class="mt-4 px-3 py-2 bg-green-50 flex items-center justify-between">
+            <div class="flex items-center text-green-800">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>현재 모집중.</span>
             </div>
-            <!-- 가입하기 버튼 -->
             <form th:action="@{/clans/signup/{clanId}(clanId=${clan.id})}" method="post">
-                <button class="join-btn" type="submit">
+                <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
                     가입하기
                 </button>
             </form>
         </div>
 
-        <!-- 이미 신청됨 상태 -->
-        <div class="recruit-bar recruit-yes" th:if="${member != null
-                                              and member.getSignupClan() != null
-                                              and clan != null
-                                              and clan.isRecruit.toString().equals('YES')
-                                              and member.getSignupClan().id == clan.id}">
-            <div class="recruit-status">
-                <div class="icon-yes"></div>
-                <div class="text-yes">이미 신청됨.</div>
+        <!-- 이미 신청됨 -->
+        <div th:if="${member != null and member.getSignupClan() != null and clan != null and clan.isRecruit.toString().equals('YES') and member.getSignupClan().id == clan.id}"
+             class="mt-4 px-3 py-2 bg-green-50">
+            <div class="flex items-center text-green-800">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>이미 신청됨.</span>
             </div>
         </div>
 
-        <div class="recruit-bar recruit-no" th:if="${member != null
-
-
-                                              and clan.isRecruit.toString().equals('YES')
-                                              and member.clan != null}">
-            <div class="recruit-status">
-                <div class="icon-no"></div>
-                <div class="text-no">가입된 동아리가 있습니다.</div>
+        <!-- 이미 가입된 동아리 있음 -->
+        <div th:if="${member != null and clan.isRecruit.toString().equals('YES') and member.clan != null}"
+             class="mt-4 px-3 py-2 bg-red-50">
+            <div class="flex items-center text-red-800">
+                <i class="fas fa-times-circle mr-2"></i>
+                <span>가입된 동아리가 있습니다.</span>
             </div>
         </div>
 
-        <!-- (4-1) 모집 상태: NO -->
-        <div class="recruit-bar recruit-no" th:if="${clan.isRecruit.toString().equals('NO')}">
-            <div class="recruit-status">
-                <div class="icon-no"></div>
-                <div class="text-no">모집이 종료되었습니다.</div>
+        <!-- 모집 종료 -->
+        <div th:if="${clan.isRecruit.toString().equals('NO')}"
+             class="mt-4 px-3 py-2 bg-red-50">
+            <div class="flex items-center text-red-800">
+                <i class="fas fa-times-circle mr-2"></i>
+                <span>모집이 종료되었습니다.</span>
             </div>
         </div>
 
-        <!-- (5) 소개 영역 -->
-        <div class="introduce-title">소개</div>
-        <div class="introduce-text" th:text="${clan.description}">
-            이 동아리의 소개 내용 (동적으로 늘어날 예정)
+        <!-- Introduction -->
+        <div class="px-4 mt-6">
+            <h2 class="text-lg text-gray-900">소개</h2>
+            <p class="mt-2 text-gray-600" th:text="${clan.description}">
+                동아리 소개 내용
+            </p>
         </div>
 
-        <!-- (6) 필수 정보 섹션 -->
-        <div class="essential-info">
-            <div class="essential-info-title">필수 정보</div>
+        <!-- Essential Info -->
+        <div class="m-4 p-4 bg-gray-50 rounded-lg">
+            <h2 class="text-lg text-gray-900 mb-4">필수 정보</h2>
 
-            <!-- 모임 일정 -->
-            <div class="icon-meeting"></div>
-            <div class="info-meeting">
-                <span class="info-title">모임 일정<br/></span>
-                <span class="info-detail" th:text="${clan.meetingTime}">
-            매주 무슨 요일 (시간 포맷)
-          </span>
+            <!-- Meeting Time -->
+            <div class="mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-calendar mr-3 text-gray-900"></i>
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">모임 일정</div>
+                        <div class="text-sm text-gray-600" th:text="${clan.meetingTime}">매주 요일 시간</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- 장소 -->
-            <div class="icon-location"></div>
-            <div class="info-location">
-                <span class="info-title">장소<br/></span>
-                <span class="info-detail" th:text="${clan.clanLocation}">
-            학생회관 몇층 몇호
-          </span>
+            <!-- Location -->
+            <div class="mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-map-marker-alt mr-3 text-gray-900"></i>
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">장소</div>
+                        <div class="text-sm text-gray-600" th:text="${clan.clanLocation}">위치 정보</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- 연락처 -->
-            <div class="icon-contact"></div>
-            <div class="info-contact">
-                <span class="info-title">연락처<br/></span>
-                <span class="info-detail" th:text="${clan.telNum}">
-            전화번호든 이메일이든 카톡
-          </span>
+            <!-- Contact -->
+            <div>
+                <div class="flex items-center">
+                    <i class="fas fa-phone mr-3 text-gray-900"></i>
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">연락처</div>
+                        <div class="text-sm text-gray-600" th:text="${clan.telNum}">연락처 정보</div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div><!-- 문서 다운로드 버튼 -->
-            <div th:if="${clan.document != null}">
-                <a th:href="@{/clans/downloadDocument/{clanId}(clanId=${clan.id})}">
-                    <button class="join-btn">문서 다운로드</button>
-                </a>
-            </div>
+
+        <!-- Document Download -->
+        <div class="px-4 pb-4" th:if="${clan.document != null}">
+            <a th:href="@{/clans/downloadDocument/{clanId}(clanId=${clan.id})}"
+               class="block w-full py-2 bg-blue-600 text-white text-center rounded hover:bg-blue-700 transition-colors">
+                문서 다운로드
+            </a>
         </div>
+    </div>
 
-    </div><!-- /card-container -->
-</div><!-- /outer-wrapper -->
-
+    <!-- Back Button -->
+    <div class="mt-4 mb-8">
+        <a href="/clans"
+           class="block w-full py-3 bg-gray-700 text-white text-center rounded hover:bg-gray-600 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            돌아가기
+        </a>
+    </div>
+</div>
 </body>
-</html>
+</html>72.14

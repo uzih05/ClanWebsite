@@ -2,7 +2,7 @@ spring:
   messages:
     basename: errors
   datasource:
-    url: jdbc:h2:tcp://localhost/~/testJPA
+    url: jdbc:h2:tcp://localhost/~/test
     username: sa
     password:
     driver-class-name: org.h2.Driver

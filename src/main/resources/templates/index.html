@@ -4,135 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>동아리 포털</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: white;
-            font-family: 'Segoe UI Symbol', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .main-container {
-            width: 402px;
-            background: white;
-        }
-        .content-wrapper {
-            background: #F9FAFB;
-            padding: 20px 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .button-container {
-            width: 290px;
-            height: 40px;
-            background: black;
-            border-radius: 6px;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        .button-container a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            color: white;
-            text-decoration: none;
-            gap: 8px;
-        }
-        .button-container i {
-            font-size: 16px;
-        }
-        .button-container a:hover {
-            background-color: #333;
-            border-radius: 6px;
-        }
-        .card {
-            width: 338px;
-            background: white;
-            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-    </style>
 </head>
-<body>
-<div class="main-container">
+<body class="bg-white min-h-screen">
+<div class="w-full max-w-lg mx-auto">
     <!-- 헤더 -->
-    <div style="padding: 16px; background: white; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);">
-        <div class="header-content" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <!-- 관리자 역할일 경우에만 버튼 표시 -->
+    <header class="bg-white shadow-sm p-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <!-- 관리자 버튼 -->
                 <a th:if="${isAdmin}"
-                   href="/admin/members" style="padding: 8px 12px; background: #374151; color: white; border-radius: 4px; text-decoration:none; font-size:14px;">
-                    <i class="fas fa-users mr-1"></i> 관리자
+                   href="/admin/members"
+                   class="px-3 py-2 bg-gray-700 text-white rounded text-sm flex items-center">
+                    <i class="fas fa-users mr-2"></i> 관리자
                 </a>
-                <div class="profile-section" style="display: flex; align-items: center; gap: 12px;">
 
-                    <img class="logo-image" th:src="'data:image/jpeg;base64,' + ${base64Image}" style="width: 32px; height: 32px; border-radius: 9999px;"
+                <!-- 프로필 섹션 -->
+                <div class="flex items-center space-x-3">
+                    <img class="w-8 h-8 rounded-full"
+                         th:src="'data:image/jpeg;base64,' + ${base64Image}"
                          alt="Profile">
-
-                    <span th:text="${member != null ? member.name + '님 환영합니다' : 'Guest' + '님 환영합니다'}"
-                          style="color: #374151; font-size: 14px;">John Smith</span>
+                    <span class="text-gray-700 text-sm"
+                          th:text="${member != null ? member.name + '님 환영합니다' : 'Guest' + '님 환영합니다'}">
+                            John Smith
+                        </span>
                 </div>
             </div>
-            <form th:action="@{/logout}" method="post" style="margin: 0;">
-                <button type="submit" style="border: none; background: none; color: #374151; font-size: 14px; cursor: pointer;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+
+            <!-- 로그아웃 버튼 -->
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="text-gray-700 text-sm hover:text-gray-900">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
                 </button>
             </form>
         </div>
-    </div>
+    </header>
 
-    <div class="content-wrapper">
+    <!-- 메인 컨텐츠 -->
+    <main class="bg-gray-50 p-4 md:p-6">
         <!-- 환영 메시지 -->
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #111827; font-size: 30px; line-height: 36px;">환영합니다!</h1>
+        <div class="text-center mb-8">
+            <h1 class="text-3xl text-gray-900 font-semibold">환영합니다!</h1>
         </div>
 
-        <!-- 동아리 둘러보기 카드 -->
-        <div class="card" style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
-            <div style="width: 64px; height: 64px; background: #E0E7FF; border-radius: 9999px; display: flex; justify-content: center; align-items: center;">
-                <i class="fas fa-search" style="font-size: 24px;"></i>
-            </div>
-            <h2 style="color: #111827; font-size: 20px; line-height: 28px;">동아리 둘러보기</h2>
-            <p style="color: #4B5563; font-size: 15.62px; line-height: 24px; text-align: center;">나에게 맞는 동아리를 탐색해보세요.</p>
-            <div class="button-container">
-                <a href="/clans">
+        <!-- 카드 섹션 -->
+        <div class="space-y-4">
+            <!-- 동아리 둘러보기 카드 -->
+            <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center space-y-4">
+                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-search text-2xl"></i>
+                </div>
+                <h2 class="text-xl text-gray-900 font-semibold">동아리 둘러보기</h2>
+                <p class="text-gray-600 text-center">나에게 맞는 동아리를 탐색해보세요.</p>
+                <a href="/clans"
+                   class="w-full max-w-xs bg-black text-white py-2 px-4 rounded flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors">
                     <i class="fas fa-search"></i>
                     <span>모든 동아리 보기</span>
                 </a>
             </div>
-        </div>
 
-        <!-- 동아리 등록하기 카드 -->
-        <div class="card" style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
-            <div style="width: 64px; height: 64px; background: #E0E7FF; border-radius: 9999px; display: flex; justify-content: center; align-items: center;">
-                <i class="fas fa-plus" style="font-size: 24px;"></i>
-            </div>
-            <h2 style="color: #111827; font-size: 20px; line-height: 28px;">동아리 등록하기</h2>
-            <p style="color: #4B5563; font-size: 15.75px; line-height: 24px; text-align: center;">동아리 회장님이신가요?<br/>동아리를 등록하세요.</p>
-            <div class="button-container">
-                <a href="/clans/clanSave">
+            <!-- 동아리 등록하기 카드 -->
+            <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center space-y-4">
+                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-plus text-2xl"></i>
+                </div>
+                <h2 class="text-xl text-gray-900 font-semibold">동아리 등록하기</h2>
+                <p class="text-gray-600 text-center">동아리 회장님이신가요?<br/>동아리를 등록하세요.</p>
+                <a href="/clans/clanSave"
+                   class="w-full max-w-xs bg-black text-white py-2 px-4 rounded flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors">
                     <i class="fas fa-plus"></i>
                     <span>동아리 등록하기</span>
                 </a>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 </body>
 </html>

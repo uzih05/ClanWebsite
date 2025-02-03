@@ -2,186 +2,102 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Page</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-        body {
-            background: white;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            width: 402px;
-            height: 874px;
-            background: #F9FAFB;
-        }
-        .profile-card {
-            width: 378px;
-            height: 156px;
-            margin: 12px;
-            position: relative;
-            background: white;
-            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        .profile-image {
-            width: 64px;
-            height: 64px;
-            padding: 12px;
-            background: #E5E7EB;
-            border-radius: 9999px;
-            position: absolute;
-            left: 16px;
-            top: 16px;
-        }
-        .profile-info {
-            margin-left: 76px;
-        }
-        .name {
-            font-size: 18px;
-            font-weight: 700;
-            color: black;
-            margin-bottom: 4px;
-        }
-        .major {
-            font-size: 14px;
-            color: #4B5563;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 60px;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 20px;
-            font-weight: 700;
-            color: black;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #6B7280;
-        }
-        .logout-button {
-            position: absolute;
-            right: 16px;
-            top: 16px;
-            padding: 8px 16px;
-            background: black;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .clubs-list {
-            width: 378px;
-            margin: 12px;
-            background: white;
-            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        .club-item {
-            margin-top: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .club-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 402px;
-            height: 69px;
-            background: white;
-            border-top: 1px solid #E5E7EB;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 0;
-        }
-    </style>
 </head>
-<body>
-<div class="container">
+<body class="bg-white min-h-screen">
+<div class="w-full max-w-lg mx-auto min-h-screen bg-gray-50 relative pb-20">
     <!-- 프로필 카드 -->
-    <div class="profile-card">
-        <div class="profile-image">
-            <i class="fas fa-user" style="font-size: 24px; color: #9CA3AF;"></i>
-        </div>
+    <div class="mx-3 my-3">
+        <div class="bg-white rounded-lg shadow-sm p-4 relative">
+            <!-- 프로필 이미지 -->
+            <div class="absolute left-4 top-4">
+                <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-2xl text-gray-400"></i>
+                </div>
+            </div>
 
-        <div class="profile-info">
-            <div class="name" th:text="${member.name}">홍길동</div>
-            <div class="major" th:text="${member.getMajor() + ' ' + member.getGrade()}">컴퓨터공학과 23학번</div>
-        </div>
+            <!-- 프로필 정보 -->
+            <div class="ml-20">
+                <div class="text-lg font-bold text-black" th:text="${member.name}">홍길동</div>
+                <div class="text-sm text-gray-600" th:text="${member.getMajor() + ' ' + member.getGrade()}">
+                    컴퓨터공학과 23학번
+                </div>
+            </div>
 
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="logout-button">
-                <i class="fas fa-sign-out-alt"></i> 로그아웃
-            </button>
-        </form>
+            <!-- 로그아웃 버튼 -->
+            <form th:action="@{/logout}" method="post" class="absolute right-4 top-4">
+                <button type="submit"
+                        class="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </button>
+            </form>
 
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number" th:text="${clanList.size()}">3</div>
-                <div class="stat-label">가입한 동아리</div>
+            <!-- 통계 -->
+            <div class="flex justify-around mt-16">
+                <div class="text-center">
+                    <div class="text-xl font-bold" th:text="${clanList.size()}">3</div>
+                    <div class="text-xs text-gray-500">가입한 동아리</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- 가입한 동아리 목록 -->
-    <div class="clubs-list">
-        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 16px;">가입한 동아리</h3>
+    <div class="mx-3 bg-white rounded-lg shadow-sm p-4">
+        <h3 class="text-sm font-bold mb-4">가입한 동아리</h3>
 
-        <div th:if="${member.getClan() == null}" style="text-align: center; color: #6B7280;">
+        <div th:if="${member.getClan() == null}" class="text-center text-gray-500">
             가입된 동아리가 없습니다.
         </div>
 
-
-        <div th:if="${member.getClan().id == clan.id && clan != null && member != null}" th:each="clan : ${clanList}" class="club-item">
-            <div class="club-info">
-                <div style="font-weight: 700;" th:text="${clan.getClanName()}">동아리명</div>
-                <div style="font-size: 12px; color: #6B7280;"
-                     th:text="${clan.leaderName == member.name ? '부장' : '부원'}">직위</div>
+        <div th:if="${member.getClan().id == clan.id && clan != null && member != null}"
+             th:each="clan : ${clanList}"
+             class="flex justify-between items-center mt-4">
+            <div>
+                <div class="font-bold" th:text="${clan.getClanName()}">동아리명</div>
+                <div class="text-xs text-gray-500"
+                     th:text="${clan.leaderName == member.name ? '부장' : '부원'}">
+                    직위
+                </div>
             </div>
-            <a th:href="@{/clans/{id}(id=${clan.id})}"
-               style="color: #3B82F6; text-decoration: none; font-size: 12px;">
-                Detail
-            </a>
-            <a th:if="${clan.leaderName == member.name}" th:href="@{/clans/{id}/manage(id=${clan.id})}"
-               style="color: #3B82F6; text-decoration: none; font-size: 12px;">
-                manage
-            </a>
+            <div class="flex gap-4">
+                <a th:href="@{/clans/{id}(id=${clan.id})}"
+                   class="text-blue-500 text-xs hover:text-blue-600">
+                    Detail
+                </a>
+                <a th:if="${clan.leaderName == member.name}"
+                   th:href="@{/clans/{id}/manage(id=${clan.id})}"
+                   class="text-blue-500 text-xs hover:text-blue-600">
+                    manage
+                </a>
+            </div>
         </div>
     </div>
-    <div><span th:if="${member.getSignupClan() != null}" th:text = "${member.getSignupClan().clanName} + '에 신청중'"></span></div>
+
+    <!-- 신청 중인 동아리 -->
+    <div class="mx-3 mt-3">
+            <span th:if="${member.getSignupClan() != null}"
+                  th:text="${member.getSignupClan().clanName} + '에 신청중'"
+                  class="text-sm text-gray-600">
+            </span>
+    </div>
 
     <!-- 하단 네비게이션 -->
-    <div class="bottom-nav">
-        <a href="/clans" style="color: #6B7280; text-decoration: none; text-align: center;">
-            <i class="fas fa-compass" style="display: block; margin-bottom: 4px;"></i>
-            <span style="font-size: 12px;">탐색</span>
-        </a>
-        <a href="/member/mypage" style="color: #3B82F6; text-decoration: none; text-align: center;">
-            <i class="fas fa-user" style="display: block; margin-bottom: 4px;"></i>
-            <span style="font-size: 12px;">내정보</span>
-        </a>
-    </div>
+    <nav class="fixed bottom-0 w-full max-w-lg bg-white border-t border-gray-200">
+        <div class="flex justify-around py-3">
+            <a href="/clans" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-compass mb-1"></i>
+                <span class="text-xs">탐색</span>
+            </a>
+            <a href="/member/mypage" class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-user mb-1"></i>
+                <span class="text-xs">내정보</span>
+            </a>
+        </div>
+    </nav>
 </div>
 </body>
 </html>
