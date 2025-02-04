@@ -27,29 +27,34 @@ public class LoginController {
     }
 
     @PostMapping("member/login")
-    public String login(@Validated @ModelAttribute("loginForm") LoginForm loginForm, BindingResult bindingResult,
-                        HttpServletRequest request, @RequestParam(defaultValue = "/") String redirectURL) {
+    public String login(@Validated @ModelAttribute("loginForm") LoginForm loginForm,
+                        BindingResult bindingResult,
+                        HttpServletRequest request,
+                        @RequestParam(defaultValue = "/") String redirectURL) {
         if (bindingResult.hasErrors()) {
             return "member/login";
         }
+
         Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
-        if (loginMember == null){
+        if (loginMember == null) {
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지않습니다");
-            return "member/login";
+            // Change this line to use redirect with error parameter
+            return "redirect:/member/login?error";
         }
+
         HttpSession session = request.getSession();
         session.setAttribute(UserConst.LOGIN_MEMBER, loginMember);
 
-        // 리디렉션 URL을 검증하여, 세션 정보가 URL에 포함되지 않도록 처리
         return "redirect:" + (redirectURL != null && !redirectURL.isEmpty() ? redirectURL : "/");
     }
 
     @PostMapping("/logout")
     public String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if (session != null){
+        if (session != null) {
             session.invalidate();
         }
-        return "redirect:/member/login";
+        // Add logout parameter to the redirect URL
+        return "redirect:/member/login?logout";
     }
 }
