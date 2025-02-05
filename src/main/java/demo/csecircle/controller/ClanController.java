@@ -221,25 +221,28 @@ public class ClanController {
     }
 
     @PostMapping("/clans/{clanId}/recruitChange")
-    public String changeRecruit(@PathVariable Long clanId,@SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member
-    ,BindingResult bindingResult){
-        if(member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT) || member.getMemberRole().equals(MemberRole.WEBSITE_ADMIN)){
+    public String changeRecruit(@PathVariable Long clanId,
+                                @SessionAttribute(name = UserConst.LOGIN_MEMBER, required = false) Member member) {
+
+        if(member.getMemberRole().equals(MemberRole.CLUB_PRESIDENT) ||
+                member.getMemberRole().equals(MemberRole.WEBSITE_ADMIN)) {
+
             Clan clan = clanService.findClanById(clanId);
-            if(!clan.getLeaderName().equals(member.getName())){
-                bindingResult.reject("동아리장이 아닙니다");
+
+            // Check if the logged-in member is the clan leader
+            if(!clan.getLeaderName().equals(member.getName())) {
+                return "redirect:/clans/{clanId}/manage";
             }
-            if(clan.getIsRecruit().equals(ClanRecruit.YES)){
-                clan.setIsRecruit(ClanRecruit.NO);
-            }
-            else if(clan.getIsRecruit().equals(ClanRecruit.NO)){
-                clan.setIsRecruit(ClanRecruit.YES);
-            }
+
+            // Toggle recruitment status
+            clan.setIsRecruit(clan.getIsRecruit().equals(ClanRecruit.YES) ?
+                    ClanRecruit.NO : ClanRecruit.YES);
+
             clanService.saveClan(clan);
-            return "redirect:/clans/{clanId}/manage";
         }
+
         return "redirect:/clans/{clanId}/manage";
     }
-
 
     @PostMapping("/clans/{clanId}/signupMember/{applicantId}/approve")
     @ResponseBody
